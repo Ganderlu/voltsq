@@ -273,7 +273,7 @@ export default function Sidebar({
             color: "transparent",
           }}
         >
-          ROLFSQ
+          VOLTSQ
         </Typography>
       </Box>
 
