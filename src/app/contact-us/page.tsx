@@ -68,7 +68,7 @@ export default function ContactUsPage() {
               letterSpacing: "-0.02em",
             }}
           >
-            Contact Us
+            Contact Us!
           </Typography>
           <Typography
             variant="h6"
@@ -88,7 +88,7 @@ export default function ContactUsPage() {
       <Container maxWidth="lg" sx={{ pb: 10 }}>
         <Grid container spacing={6}>
           {/* Contact Info */}
-          <Grid item xs={12} md={5}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
               <InfoCard
                 icon={<Mail size={24} className="text-emerald-500" />}
@@ -115,7 +115,7 @@ export default function ContactUsPage() {
           </Grid>
 
           {/* Contact Form */}
-          <Grid item xs={12} md={7}>
+          <Grid size={{ xs: 12, md: 7 }}>
             <Card
               elevation={0}
               sx={{
@@ -153,14 +153,14 @@ export default function ContactUsPage() {
 
                 <form id="contact-form" action={handleSubmit}>
                   <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
+                    <Grid size={{ xs: 12, md: 6 }}>
                       <CustomTextField
                         name="name"
                         label="Your Name"
                         placeholder="John Doe"
                       />
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    <Grid size={{ xs: 12, md: 6 }}>
                       <CustomTextField
                         name="email"
                         type="email"
@@ -168,7 +168,7 @@ export default function ContactUsPage() {
                         placeholder="john@example.com"
                       />
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid size={{ xs: 12 }}>
                       <CustomTextField
                         name="subject"
                         label="Subject"
@@ -176,7 +176,7 @@ export default function ContactUsPage() {
                         required={false}
                       />
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid size={{ xs: 12 }}>
                       <CustomTextField
                         name="message"
                         label="Message"
@@ -185,7 +185,7 @@ export default function ContactUsPage() {
                         placeholder="Tell us more about your inquiry..."
                       />
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid size={{ xs: 12 }}>
                       <Button
                         type="submit"
                         variant="contained"
