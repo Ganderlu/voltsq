@@ -18,24 +18,29 @@ export default function CryptoTicker() {
     script.async = true;
     script.innerHTML = JSON.stringify({
       symbols: [
-        { proName: "NASDAQ:AAPL", title: "Apple" },
-        { proName: "FX_IDC:EURUSD", title: "EUR/USD" },
         { proName: "BITSTAMP:BTCUSD", title: "Bitcoin" },
         { proName: "BITSTAMP:ETHUSD", title: "Ethereum" },
-        { proName: "BITSTAMP:XRPUSD", title: "XRP" },
+        { proName: "BITSTAMP:USDTUSD", title: "Tether USDT" },
         { proName: "BITSTAMP:BNBUSD", title: "BNB" },
-        { proName: "BITSTAMP:ADAUSD", title: "Cardano" },
         { proName: "BITSTAMP:SOLUSD", title: "Solana" },
+        { proName: "BITSTAMP:ADAUSD", title: "Cardano" },
+        { proName: "BITSTAMP:XRPUSD", title: "XRP" },
+        { proName: "BITSTAMP:DOGEUSD", title: "Dogecoin" },
+        { proName: "BITSTAMP:LTCUSD", title: "Litecoin" },
       ],
       showSymbolLogo: true,
-      colorTheme: resolvedTheme === "light" ? "light" : "dark",
-      isTransparent: true,
+      colorTheme: "light",
+      isTransparent: false,
       displayMode: "adaptive",
       locale: "en",
     });
 
     containerRef.current.appendChild(script);
-  }, [resolvedTheme]);
+  }, []);
 
-  return <div ref={containerRef} className="mb-6 w-full" />;
+  return (
+    <div className="w-full border-b border-gray-200 bg-white">
+      <div ref={containerRef} />
+    </div>
+  );
 }

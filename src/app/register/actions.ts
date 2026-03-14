@@ -3,12 +3,17 @@
 import { redirect } from "next/navigation";
 import { adminAuth, adminDb } from "../firebase/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
+import { headers } from "next/headers";
+import { sendWelcomeEmail } from "../utils/email";
 
 /* =========================
    STEP 1 — PERSONAL INFO
 ========================= */
 export async function saveStep1(formData: FormData) {
   try {
+    const headersList = await headers();
+    const userIp = headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "Unknown";
+
     const data = {
       username: formData.get("username"),
       fullName: formData.get("fullName"),
@@ -16,6 +21,7 @@ export async function saveStep1(formData: FormData) {
       phone: formData.get("phone"),
       referredBy: formData.get("referredBy") || null,
       step: 1,
+      ipAddress: userIp,
       createdAt: new Date(),
     };
 
@@ -111,6 +117,7 @@ export async function completeRegistration(formData: FormData) {
     phone: string;
     country: string;
     referredBy: string | null;
+    ipAddress: string;
   };
 
   try {
@@ -134,6 +141,7 @@ export async function completeRegistration(formData: FormData) {
         phone: data.phone || "",
         country: data.country,
         referredBy: data.referredBy || null,
+        ipAddress: data.ipAddress || "Unknown",
         mode: "demo",
         balanceDemo: 10000,
         balanceLive: 0,
@@ -167,6 +175,13 @@ export async function completeRegistration(formData: FormData) {
         type: "signup",
         timestamp: new Date(),
       });
+    }
+
+    // 📧 SEND WELCOME EMAIL
+    try {
+      await sendWelcomeEmail(data.email, data.fullName);
+    } catch (emailErr) {
+      console.error("Failed to send welcome email:", emailErr);
     }
 
     // 🧹 CLEAN TEMP REGISTRATION DATA

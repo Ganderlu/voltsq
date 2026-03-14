@@ -157,7 +157,7 @@ export default function Sidebar({ open, onClose, disabled = false }: any) {
               fontSize: "1.25rem",
             }}
           >
-            rolfsq Admin
+            voltsq Admin
           </Typography>
         </Stack>
       </Box>

@@ -118,7 +118,12 @@ export function useUserStats() {
       ),
       (snap) => {
         let total = 0;
-        snap.forEach((d) => (total += d.data().commission || 0));
+        snap.forEach((d) => {
+          const data = d.data();
+          // Sum up numerical commission values
+          const comm = parseFloat(data.commission?.toString().replace(/[$,]/g, "")) || 0;
+          total += comm;
+        });
 
         setStats((s) => ({
           ...s,

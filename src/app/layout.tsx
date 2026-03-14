@@ -9,7 +9,7 @@ import ChatWidget from "@/app/components/ChatWidget";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Rolfsq  Invest | Premium Digital Asset Trading",
+  title: "Voltsq  Invest | Premium Digital Asset Trading",
   description:
     "Secure, transparent, and efficient way to grow your portfolio with advanced trading algorithms.",
   icons: {

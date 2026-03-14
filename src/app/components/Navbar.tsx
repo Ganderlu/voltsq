@@ -209,7 +209,7 @@ export default function Navbar() {
                 color: "transparent",
               }}
             >
-              Rolfsq
+              Voltsq
             </Typography>
           </Link>
 

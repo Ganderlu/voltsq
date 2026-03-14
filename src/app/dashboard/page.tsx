@@ -1,8 +1,7 @@
- "use client";
+"use client";
 
 import { useRouter } from "next/navigation";
 import SelectAsset from "../components/SelectAsset";
-import TradingViewChart from "../components/TradingViewChart";
 import PlaceOrder from "../components/PlaceOrder";
 import ActiveTrades from "../components/ActiveTrades";
 import { useUserStats } from "@/hooks/useUserStats";
@@ -54,21 +53,19 @@ export default function Dashboard() {
         <MiniCard label="Total P&L" value={`$${stats.netPnL}`} highlight />
       </div>
 
-      <section className="w-full bg-background min-h-screen p-4 md:p-6">
-        <div className="grid grid-cols-1 xl:grid-cols-[300px_1fr_320px] gap-6">
-          {/* Left */}
+      <section className="w-full bg-background p-4 md:p-6">
+        <div className="grid grid-cols-1 xl:grid-cols-[300px_1fr] gap-6">
+          {/* Left: Asset Selection */}
           <SelectAsset />
 
-          {/* Center */}
-          <div className="bg-card border border-border rounded-2xl p-4">
-            <h3 className="text-foreground font-semibold mb-3">Chart</h3>
-            <TradingViewChart />
-          </div>
-
-          {/* Right */}
-          <div className="space-y-6">
-            <PlaceOrder />
-            <ActiveTrades />
+          {/* Right: Order Form & Active Trades */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-6">
+            <div className="space-y-6">
+              <ActiveTrades />
+            </div>
+            <div className="space-y-6">
+              <PlaceOrder />
+            </div>
           </div>
         </div>
       </section>
