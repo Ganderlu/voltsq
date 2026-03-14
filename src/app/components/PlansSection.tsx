@@ -4,62 +4,81 @@ import { useLanguage } from "@/context/LanguageContext";
 
 const plans = [
   {
-    name: "Student Plan",
-    rate: "2% / Daily",
-    price: "$100/$4,999",
+    name: "Rare Plan",
+    rate: "3% / Daily",
+    price: "$100 - $999",
     features: [
-      "Access to a real-time dashboard",
-      "Standard customer support (response within 24 hours)",
-      "Free training on the basics of investing",
-      "Loyalty bonus: +3% yield after 5 days",
-      "Referral program: 5% bonus on referrals’ investments",
+      "Real-time market dashboard access",
+      "Standard 24/7 customer support",
+      "Weekly market analysis reports",
+      "Secure multi-sig wallet integration",
+      "Referral program: 5% commission",
     ],
   },
   {
-    name: "Professional Plan",
-    rate: "3% / Daily",
-    price: "$5,000/$14,999",
+    name: "Business Plan",
+    rate: "10% / Daily",
+    price: "$1,000 - $9,999",
     features: [
-      "All the benefits of the Starter Plan",
-      "Priority customer support (response within 24 hours)",
-      "Access to a monthly analysis of your portfolio",
-      "Exclusive webinars with financial experts",
-      "2% cashback on new deposits",
-      "Loyalty bonus: +5% yield after 7 days",
-      "Improved referral program: 5% bonus return",
+      "All Rare Plan features included",
+      "Priority 24/7 fast-track support",
+      "Monthly portfolio performance review",
+      "Exclusive expert-led webinars",
+      "Advanced risk management tools",
+      "2% cashback on all new deposits",
     ],
   },
   {
     name: "Gold Plan",
-    rate: "3.5% / Daily",
-    price: "$15,000/$49,999",
+    rate: "15% / Daily",
+    price: "$10,000 - $49,999",
     features: [
-      "All the benefits of the Growth Plan",
-      "Dedicated account manager",
-      "Access to private investment opportunities",
-      "Personalized wealth management coaching",
-      "Invitation to exclusive events (networking, VIP conferences)",
-      "5% cashback on new deposits",
-      "Loyalty bonus: +10% return after 7 days",
-      "VIP referral program: 5% bonus",
-      "24-hour premium support",
+      "All Business Plan features included",
+      "Dedicated senior account manager",
+      "Private investment pool access",
+      "Personalized wealth coaching sessions",
+      "VIP networking event invitations",
+      "5% cashback on all new deposits",
+      "Instant withdrawal processing",
     ],
   },
   {
     name: "Real Estate Plan",
-    rate: "28% / Daily",
-    price: "$50,000/$ and more",
+    rate: "20% / Weekly",
+    price: "$50,000 - $400,000",
     features: [
-      "All the advantages of the Elite Plan",
-      "Dedicated account manager",
-      "Access to private real estate investment opportunities",
-      "Personalized wealth management coaching",
-      "Invitation to exclusive events",
-      "5% cashback on new deposits",
-      "Loyalty bonus: +5% return after 1 month",
-      "VIP referral program",
-      "24-hour premium support",
-      "Investors earn 28% of their initial capital after one month of investing in real estate plan",
+      "Institutional-grade security & legal",
+      "Direct fractional property ownership",
+      "Quarterly property yield distributions",
+      "Early access to new listings",
+      "Tax optimization consultation",
+      "28% capital growth after 30 days",
+    ],
+  },
+  {
+    name: "Promo Plan",
+    rate: "30% / Weekly",
+    price: "$2,000 (Fixed)",
+    features: [
+      "High-yield short-term investment",
+      "Special 30% promotional rate",
+      "Limited time entry opportunity",
+      "Automated daily profit distribution",
+      "Principal protection guarantee",
+      "24/7 premium support access",
+    ],
+  },
+  {
+    name: "Joint Investment Plan",
+    rate: "50% / Daily",
+    price: "$10,000 - $30,000",
+    features: [
+      "Collaborative wealth building",
+      "Our highest daily return (50%)",
+      "Shared risk and reward structure",
+      "Monthly joint strategy meetings",
+      "Full transparency & audit logs",
+      "Dedicated joint account support",
     ],
   },
 ];
@@ -70,15 +89,15 @@ export default function PlansSection() {
   return (
     <section className="w-full bg-background px-4 py-20 border-t border-border">
       <div className="max-w-7xl mx-auto text-center mb-16">
-        <h2 className="text-foreground text-2xl md:text-3xl font-semibold mb-3">
+        <h2 className="text-foreground text-3xl md:text-4xl font-bold mb-4">
           {t("plans.heading")}
         </h2>
-        <p className="text-muted-foreground text-sm md:text-base max-w-2xl mx-auto">
+        <p className="text-muted-foreground text-base md:text-lg max-w-3xl mx-auto">
           {t("plans.subheading")}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
         {plans.map((plan, i) => (
           <div
             key={i}

@@ -401,6 +401,17 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
                   Joined
                 </TableCell>
                 <TableCell
+                  sx={{
+                    color: "var(--muted-foreground)",
+                    fontWeight: 700,
+                    fontSize: "0.75rem",
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                  }}
+                >
+                  Location/IP
+                </TableCell>
+                <TableCell
                   align="right"
                   sx={{
                     color: "var(--muted-foreground)",
@@ -512,6 +523,31 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
                     }}
                   >
                     {u.joined}
+                  </TableCell>
+                  <TableCell>
+                    <Stack spacing={0.5}>
+                      <Typography
+                        variant="caption"
+                        fontWeight="700"
+                        sx={{
+                          color: "var(--foreground)",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 0.5,
+                        }}
+                      >
+                        🌍 {u.country || "N/A"}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: "var(--muted-foreground)",
+                          fontSize: "0.65rem",
+                        }}
+                      >
+                        IP: {u.ipAddress || "N/A"}
+                      </Typography>
+                    </Stack>
                   </TableCell>
                   <TableCell align="right">
                     <Stack
@@ -840,6 +876,28 @@ function UserCard({ user, onStatusToggle, onBalanceClick, loading }: any) {
                 }}
               >
                 {user.kyc || "Pending"}
+              </Typography>
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "var(--muted-foreground)",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  fontSize: "0.6rem",
+                  letterSpacing: 0.5,
+                  display: "block",
+                  mb: 0.5,
+                }}
+              >
+                Location & IP
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{ color: "var(--foreground)", fontWeight: 700 }}
+              >
+                🌍 {user.country || "N/A"} • {user.ipAddress || "N/A"}
               </Typography>
             </Grid>
           </Grid>

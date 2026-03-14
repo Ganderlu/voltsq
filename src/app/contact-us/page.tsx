@@ -115,7 +115,7 @@ export default function ContactUsPage() {
                       variant="body1"
                       sx={{ color: "var(--primary)", fontWeight: "medium" }}
                     >
-                      support@Rolfsq .com
+                      support@Voltsq .com
                     </Typography>
                   </Box>
                 </CardContent>

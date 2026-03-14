@@ -297,7 +297,7 @@ export default function Sidebar({
               fontSize: "1.25rem",
             }}
           >
-            rolfsq
+            voltsq
           </Typography>
         </Stack>
       </Box>

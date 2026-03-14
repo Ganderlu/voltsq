@@ -35,20 +35,20 @@ export default function InvestmentPlansPage() {
 
   const plans = [
     {
-      title: "Student Plan",
+      title: "Rare Plan",
       duration: "5 Days",
-      interest: "2%",
-      limit: "$100 - $4,999",
-      returnText: "10% + capital",
+      interest: "3%",
+      limit: "$100 - $999",
+      returnText: "15% + capital",
       icon: <Target size={24} />,
       color: "#6366f1",
     },
     {
-      title: "Professional Plan",
-      duration: "5 Days",
-      interest: "3%",
-      limit: "$5,000 - $14,999",
-      returnText: "15% + capital",
+      title: "Business Plan",
+      duration: "7 Days",
+      interest: "10%",
+      limit: "$1,000 - $9,999",
+      returnText: "70% + capital",
       recommended: true,
       icon: <BarChart3 size={24} />,
       color: "#22c55e",
@@ -56,21 +56,41 @@ export default function InvestmentPlansPage() {
     {
       title: "Gold Plan",
       duration: "7 Days",
-      interest: "3.5%",
-      limit: "$15,000 - $49,999",
-      returnText: "24.5% + capital",
+      interest: "15%",
+      limit: "$10,000 - $49,999",
+      returnText: "105% + capital",
       icon: <Gem size={24} />,
       color: "#eab308",
     },
     {
       title: "Real Estate Plan",
-      duration: "1 Month",
-      interest: "28%",
-      limit: "$50,000 - $500,000",
+      duration: "30 Days",
+      interest: "0.933%", // 28% over 30 days as per landing page feature
+      displayInterest: "20% / Weekly",
+      limit: "$50,000 - $400,000",
       returnText: "28% + capital",
-      note: "For Enterprise and Large Investors",
+      note: "For Institutional Investors",
       icon: <Building2 size={24} />,
       color: "#ef4444",
+    },
+    {
+      title: "Promo Plan",
+      duration: "7 Days",
+      interest: "4.285%", // 30% weekly
+      displayInterest: "30% / Weekly",
+      limit: "$2,000",
+      returnText: "30% + capital",
+      icon: <ShieldCheck size={24} />,
+      color: "#06b6d4",
+    },
+    {
+      title: "Joint Investment Plan",
+      duration: "30 Days",
+      interest: "50%",
+      limit: "$10,000 - $30,000",
+      returnText: "1500% + capital",
+      icon: <TrendingUp size={24} />,
+      color: "#f59e0b",
     },
   ];
 
@@ -83,11 +103,25 @@ export default function InvestmentPlansPage() {
       }}
     >
       <Box sx={{ mb: 6 }}>
-        <Typography variant="h4" fontWeight="800" sx={{ color: "#ffffff", mb: 1.5, display: "flex", alignItems: "center", gap: 1.5 }}>
+        <Typography
+          variant="h4"
+          fontWeight="800"
+          sx={{
+            color: "#ffffff",
+            mb: 1.5,
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+          }}
+        >
           <TrendingUp size={32} color="primary.main" /> Investment Plans
         </Typography>
-        <Typography variant="body1" sx={{ color: "var(--muted-foreground)", maxWidth: "700px" }}>
-          Securely grow your wealth with our curated binary investment strategies. Choose a plan that fits your financial objectives.
+        <Typography
+          variant="body1"
+          sx={{ color: "var(--muted-foreground)", maxWidth: "700px" }}
+        >
+          Securely grow your wealth with our curated binary investment
+          strategies. Choose a plan that fits your financial objectives.
         </Typography>
       </Box>
 
@@ -102,7 +136,9 @@ export default function InvestmentPlansPage() {
                 bgcolor: "var(--card)",
                 borderRadius: 4,
                 border: "1px solid",
-                borderColor: plan.recommended ? "primary.main" : "var(--border)",
+                borderColor: plan.recommended
+                  ? "primary.main"
+                  : "var(--border)",
                 display: "flex",
                 flexDirection: "column",
                 height: "100%",
@@ -134,17 +170,37 @@ export default function InvestmentPlansPage() {
               )}
 
               <Box sx={{ mb: 4 }}>
-                <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-                  <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: `${plan.color}15`, color: plan.color, display: "flex" }}>
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  alignItems="center"
+                  sx={{ mb: 2 }}
+                >
+                  <Box
+                    sx={{
+                      p: 1.5,
+                      borderRadius: 3,
+                      bgcolor: `${plan.color}15`,
+                      color: plan.color,
+                      display: "flex",
+                    }}
+                  >
                     {plan.icon}
                   </Box>
-                  <Typography variant="h5" fontWeight="800" sx={{ color: "#ffffff" }}>
+                  <Typography
+                    variant="h5"
+                    fontWeight="800"
+                    sx={{ color: "#ffffff" }}
+                  >
                     {plan.title}
                   </Typography>
                 </Stack>
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <Clock size={16} color="var(--muted-foreground)" />
-                  <Typography variant="body2" sx={{ color: "var(--muted-foreground)", fontWeight: "600" }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "var(--muted-foreground)", fontWeight: "600" }}
+                  >
                     Duration: {plan.duration}
                   </Typography>
                 </Stack>
@@ -153,42 +209,85 @@ export default function InvestmentPlansPage() {
               <Divider sx={{ borderColor: "rgba(255,255,255,0.05)", mb: 4 }} />
 
               <Stack spacing={2.5} sx={{ mb: 5, flex: 1 }}>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography variant="body2" sx={{ color: "var(--muted-foreground)", fontWeight: "500" }}>
-                    Daily Return
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "var(--muted-foreground)", fontWeight: "500" }}
+                  >
+                    Return Rate
                   </Typography>
-                  <Typography variant="h6" fontWeight="800" sx={{ color: plan.color }}>
-                    {plan.interest}
+                  <Typography
+                    variant="h6"
+                    fontWeight="800"
+                    sx={{ color: plan.color }}
+                  >
+                    {plan.displayInterest || `${plan.interest} / Daily`}
                   </Typography>
                 </Box>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography variant="body2" sx={{ color: "var(--muted-foreground)", fontWeight: "500" }}>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "var(--muted-foreground)", fontWeight: "500" }}
+                  >
                     Investment Limit
                   </Typography>
-                  <Typography variant="body1" fontWeight="700" sx={{ color: "#ffffff" }}>
+                  <Typography
+                    variant="body1"
+                    fontWeight="700"
+                    sx={{ color: "#ffffff" }}
+                  >
                     {plan.limit}
                   </Typography>
                 </Box>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography variant="body2" sx={{ color: "var(--muted-foreground)", fontWeight: "500" }}>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "var(--muted-foreground)", fontWeight: "500" }}
+                  >
                     Total Return
                   </Typography>
-                  <Typography variant="body1" fontWeight="700" sx={{ color: "#22c55e" }}>
+                  <Typography
+                    variant="body1"
+                    fontWeight="700"
+                    sx={{ color: "#22c55e" }}
+                  >
                     {plan.returnText}
                   </Typography>
                 </Box>
                 {plan.note && (
-                  <Box sx={{ 
-                    mt: 2, 
-                    p: 1.5, 
-                    borderRadius: 2, 
-                    bgcolor: "rgba(255,255,255,0.02)", 
-                    border: "1px dashed rgba(255,255,255,0.1)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1
-                  }}>
-                    <Typography variant="caption" sx={{ color: plan.color, fontWeight: "700", textAlign: "center", width: "100%" }}>
+                  <Box
+                    sx={{
+                      mt: 2,
+                      p: 1.5,
+                      borderRadius: 2,
+                      bgcolor: "rgba(255,255,255,0.02)",
+                      border: "1px dashed rgba(255,255,255,0.1)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: plan.color,
+                        fontWeight: "700",
+                        textAlign: "center",
+                        width: "100%",
+                      }}
+                    >
                       {plan.note}
                     </Typography>
                   </Box>
@@ -227,10 +326,20 @@ export default function InvestmentPlansPage() {
         ))}
       </Grid>
 
-      <Stack direction="row" spacing={1} justifyContent="center" alignItems="center" sx={{ mt: 8, mb: 4, opacity: 0.6 }}>
+      <Stack
+        direction="row"
+        spacing={1}
+        justifyContent="center"
+        alignItems="center"
+        sx={{ mt: 8, mb: 4, opacity: 0.6 }}
+      >
         <ShieldCheck size={16} color="var(--muted-foreground)" />
-        <Typography variant="caption" sx={{ color: "var(--muted-foreground)", fontWeight: "600" }}>
-          All investments are protected by end-to-end encryption and cold storage security.
+        <Typography
+          variant="caption"
+          sx={{ color: "var(--muted-foreground)", fontWeight: "600" }}
+        >
+          All investments are protected by end-to-end encryption and cold
+          storage security.
         </Typography>
       </Stack>
 

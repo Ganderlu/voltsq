@@ -28,6 +28,8 @@ export default async function ManageUsersPage() {
       status: data.status,
       joined: data.createdAt?.toDate().toDateString(),
       walletBalance: data.walletBalance ?? 0,
+      ipAddress: data.ipAddress || "N/A",
+      country: data.country || "N/A",
     };
   });
 

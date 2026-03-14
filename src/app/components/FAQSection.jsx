@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import {
   Box,
@@ -14,7 +16,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 export default function FAQSection() {
   const faqs = [
     "How do I create my account?",
-    "How long does my deposit take before it can reflect on my Rolfsq  Investments account dashboard?",
+    "How long does my deposit take before it can reflect on my Voltsq  Investments account dashboard?",
     "How many times can I make a deposit?",
     "How do I make a deposit?",
     "How many years has it been functional?",
@@ -65,7 +67,7 @@ export default function FAQSection() {
                 </AccordionSummary>
                 <AccordionDetails>
                   <Typography sx={{ color: "var(--muted-foreground)" }}>
-                    This answer will be provided by Rolfsq Investments.
+                    This answer will be provided by Voltsq Investments.
                   </Typography>
                 </AccordionDetails>
               </Accordion>
@@ -88,7 +90,7 @@ export default function FAQSection() {
                 Need any help!
               </Typography>
               <Typography sx={{ opacity: 0.9, mb: 4 }}>
-                Find answers to frequently asked questions about rolfsq
+                Find answers to frequently asked questions about voltsq
               </Typography>
             </Box>
 

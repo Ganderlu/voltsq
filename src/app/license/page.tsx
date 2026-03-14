@@ -80,7 +80,7 @@ export default function LicensePage() {
                   variant="body1"
                   sx={{ color: "text.secondary", mb: 2 }}
                 >
-                  Rolfsq Invest is a fully registered financial services
+                  Voltsq Invest is a fully registered financial services
                   provider, operating in compliance with international financial
                   laws.
                 </Typography>

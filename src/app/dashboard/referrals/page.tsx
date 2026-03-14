@@ -208,7 +208,7 @@ export default function ReferralsPage() {
             Refer & Earn
           </Typography>
           <Typography variant="body2" sx={{ color: "var(--muted-foreground)" }}>
-            Invite your friends to Rolfsq and earn a $5.00 bonus for every
+            Invite your friends to Voltsq and earn a $5.00 bonus for every
             successful registration.
           </Typography>
         </Box>

@@ -55,14 +55,14 @@ export default function RegisterPersonalInfoPage() {
               R
             </div>
             <span className="text-foreground font-semibold tracking-wide">
-              Rolfsq <span className="text-muted-foreground">INVEST</span>
+              Voltsq <span className="text-muted-foreground">INVEST</span>
             </span>
           </div>
         </div>
 
         {/* Header */}
         <h1 className="text-center text-2xl font-semibold text-foreground mb-1">
-          Join <span className="text-primary">Rolfsq </span>
+          Join <span className="text-primary">Voltsq </span>
         </h1>
         <p className="text-center text-sm text-muted-foreground mb-5">
           Start your professional trading journey
@@ -163,7 +163,7 @@ export default function RegisterPersonalInfoPage() {
         </div>
 
         <p className="text-center text-[10px] text-muted-foreground/60 mt-4">
-          © 2026 Rolfsq Invest. All rights reserved. Licensed and regulated
+          © 2026 Voltsq Invest. All rights reserved. Licensed and regulated
           trading platform.
         </p>
       </div>
