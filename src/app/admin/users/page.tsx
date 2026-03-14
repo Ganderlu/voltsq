@@ -6,34 +6,68 @@ export const dynamic = "force-dynamic";
 
 export default async function ManageUsersPage() {
   if (!adminDb) {
-    throw new Error(
-      "Firebase Admin not initialized. Check .env.local and restart the server.",
+    console.error("❌ [ManageUsersPage] adminDb is not initialized");
+    return (
+      <div className="p-10 text-center">
+        <h2 className="text-xl font-bold text-red-500">Database Error</h2>
+        <p className="text-muted-foreground mt-2">
+          Firebase Admin SDK is not properly initialized. Please verify your{" "}
+          <code>FIREBASE_SERVICE_ACCOUNT</code> environment variable in Vercel.
+        </p>
+      </div>
     );
   }
 
-  const snapshot = await adminDb
-    .collection("users")
-    .orderBy("createdAt", "desc")
-    .limit(10)
-    .get();
+  try {
+    const snapshot = await adminDb
+      .collection("users")
+      .orderBy("createdAt", "desc")
+      .limit(50) // Increased limit for better management
+      .get();
 
-  const users = snapshot.docs.map((doc: QueryDocumentSnapshot) => {
-    const data = doc.data();
-    return {
-      id: doc.id,
-      fullName: data.fullName,
-      email: data.email,
-      verified: data.verified,
-      kyc: data.kycStatus,
-      status: data.status,
-      joined: data.createdAt?.toDate().toDateString(),
-      walletBalance: data.walletBalance ?? 0,
-      ipAddress: data.ipAddress || "N/A",
-      country: data.country || "N/A",
-    };
-  });
+    const users = snapshot.docs.map((doc: QueryDocumentSnapshot) => {
+      const data = doc.data();
+      
+      // Robust date parsing to prevent crashes
+      let joinedDate = "N/A";
+      try {
+        if (data.createdAt && typeof data.createdAt.toDate === "function") {
+          joinedDate = data.createdAt.toDate().toDateString();
+        } else if (data.createdAt instanceof Date) {
+          joinedDate = data.createdAt.toDateString();
+        } else if (typeof data.createdAt === "string") {
+          joinedDate = new Date(data.createdAt).toDateString();
+        }
+      } catch (e) {
+        console.warn(`⚠️ [ManageUsersPage] Could not parse date for user ${doc.id}:`, e);
+      }
 
-  return <UsersClient initialUsers={users} />;
+      return {
+        id: doc.id,
+        fullName: data.fullName || "Unnamed User",
+        email: data.email || "No Email",
+        verified: !!data.verified,
+        kyc: data.kycStatus || "pending",
+        status: data.status || "active",
+        joined: joinedDate,
+        walletBalance: Number(data.walletBalance ?? 0),
+        ipAddress: data.ipAddress || "N/A",
+        country: data.country || "N/A",
+      };
+    });
+
+    return <UsersClient initialUsers={users} />;
+  } catch (error) {
+    console.error("❌ [ManageUsersPage] Error fetching users:", error);
+    return (
+      <div className="p-10 text-center">
+        <h2 className="text-xl font-bold text-red-500">Error Loading Users</h2>
+        <p className="text-muted-foreground mt-2">
+          There was an issue retrieving the user list from the server.
+        </p>
+      </div>
+    );
+  }
 }
 
 // import { Card, CardContent } from "@/components/ui/card";

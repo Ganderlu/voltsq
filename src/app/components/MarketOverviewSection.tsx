@@ -11,9 +11,6 @@ export default function MarketOverviewSection() {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Clear previous widget
-    containerRef.current.innerHTML = "";
-
     const script = document.createElement("script");
     script.src = "https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js";
     script.async = true;
@@ -46,6 +43,8 @@ export default function MarketOverviewSection() {
       ],
     });
 
+    // Clear previous widget before adding new one
+    containerRef.current.innerHTML = "";
     containerRef.current.appendChild(script);
   }, [resolvedTheme]);
 
