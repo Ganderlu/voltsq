@@ -51,7 +51,7 @@ export default function VideoSection() {
               objectFit: "cover",
             }}
           >
-            <source src="/videos/BELL.mp4" type="video/mp4" />
+            <source src="/videos/premiervideo.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         </Box>

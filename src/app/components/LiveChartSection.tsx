@@ -5,40 +5,11 @@ import { Box, Container, Typography } from "@mui/material";
 import { useTheme } from "next-themes";
 
 export default function LiveChartSection() {
-  const containerRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    // Clear previous widget
-    containerRef.current.innerHTML = "";
-
-    const script = document.createElement("script");
-    script.src = "https://s3.tradingview.com/tv.js";
-    script.async = true;
-    script.onload = () => {
-      // @ts-expect-error // TradingView is a global variable from the script
-      if (typeof window.TradingView !== "undefined") {
-        // @ts-expect-error
-        new window.TradingView.widget({
-          autosize: true,
-          symbol: "BINANCE:BTCUSDT",
-          interval: "D",
-          timezone: "Etc/UTC",
-          theme: resolvedTheme === "light" ? "light" : "dark",
-          style: "1",
-          locale: "en",
-          toolbar_bg: resolvedTheme === "light" ? "#f1f3f6" : "#131722",
-          enable_publishing: false,
-          allow_symbol_change: true,
-          container_id: "tradingview_advanced_chart",
-        });
-      }
-    };
-
-    containerRef.current.appendChild(script);
-  }, [resolvedTheme]);
+  const theme = resolvedTheme === "light" ? "light" : "dark";
+  
+  // Construct the URL for the TradingView Widget
+  const chartUrl = `https://s.tradingview.com/widgetembed/?frameElementId=tradingview_chart&symbol=BINANCE%3ABTCUSDT&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=${theme === "light" ? "f1f3f6" : "131722"}&studies=[]&theme=${theme}&style=1&timezone=Etc%2FUTC&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en&utm_source=localhost&utm_medium=widget&utm_campaign=chart&utm_term=BINANCE%3ABTCUSDT`;
 
   return (
     <Box sx={{ bgcolor: "var(--background)", py: { xs: 6, md: 10 } }}>
@@ -75,10 +46,11 @@ export default function LiveChartSection() {
             bgcolor: resolvedTheme === "light" ? "#f1f3f6" : "#131722",
           }}
         >
-          <div
-            id="tradingview_advanced_chart"
-            ref={containerRef}
-            style={{ height: "100%", width: "100%" }}
+          <iframe
+            id="tradingview_chart"
+            src={chartUrl}
+            style={{ width: "100%", height: "100%", border: "none" }}
+            allowFullScreen
           />
         </Box>
       </Container>

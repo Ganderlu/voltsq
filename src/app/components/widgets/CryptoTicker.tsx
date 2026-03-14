@@ -10,11 +10,9 @@ export default function CryptoTicker() {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Clear previous widget
-    containerRef.current.innerHTML = "";
-
     const script = document.createElement("script");
-    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js";
+    script.src =
+      "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js";
     script.async = true;
     script.innerHTML = JSON.stringify({
       symbols: [
@@ -29,17 +27,19 @@ export default function CryptoTicker() {
         { proName: "BITSTAMP:LTCUSD", title: "Litecoin" },
       ],
       showSymbolLogo: true,
-      colorTheme: "light",
+      colorTheme: resolvedTheme === "light" ? "light" : "dark",
       isTransparent: false,
       displayMode: "adaptive",
       locale: "en",
     });
 
+    // Clear previous widget before adding new one
+    containerRef.current.innerHTML = "";
     containerRef.current.appendChild(script);
-  }, []);
+  }, [resolvedTheme]);
 
   return (
-    <div className="w-full border-b border-gray-200 bg-white">
+    <div className="w-full border-b border-border bg-background">
       <div ref={containerRef} />
     </div>
   );

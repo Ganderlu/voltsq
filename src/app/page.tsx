@@ -21,23 +21,24 @@ import PlansSection from "./components/PlansSection";
 import TradingHero from "./components/TradingHero";
 import FAQSection from "./components/FAQSection";
 import Footer from "./components/Footer";
+import InvestmentPopups from "./components/InvestmentPopups";
 
 export default function Home() {
   return (
     <Box sx={{ bgcolor: "var(--background)" }}>
       <Navbar />
-      <CryptoTicker />
+      {/* <CryptoTicker /> */}
       <Hero />
       <VideoSection />
       {/* <CryptoStats /> */}
       <TradeSection />
       <FeatureCards />
       <WhyPrimeMax />
-      <LiveChartSection />
+      {/* <LiveChartSection /> */}
       <CommunitySection />
       <Advisor />
       <PrinciplesSection />
-      <MarketOverviewSection />
+      {/* <MarketOverviewSection /> */}
       <ServicesSection />
       <TestimonialsSection />
       <CreditCard />
@@ -46,6 +47,7 @@ export default function Home() {
       <TradingHero />
       <FAQSection />
       <Footer />
+      <InvestmentPopups />
     </Box>
   );
 }
