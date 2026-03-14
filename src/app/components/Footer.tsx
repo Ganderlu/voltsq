@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Facebook, Twitter, Instagram, Linkedin, Mail, Headphones } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -15,69 +16,84 @@ export default function Footer() {
                 alt="Voltsq "
                 width={48}
                 height={48}
+                className="rounded-full border border-primary/20"
               />
-              <h2 className="text-2xl text-primary font-bold">Voltsq </h2>
+              <h2 className="text-2xl text-primary font-bold tracking-tight">Voltsq </h2>
             </div>
 
-            <p className="text-sm leading-relaxed mb-6 max-w-md text-foreground">
-              We are everything a traditional financial institution is not. We
-              set out to give investors better, simpler and more profitable ways
-              to become financially successful and secure.
+            <p className="text-sm leading-relaxed mb-6 max-w-md text-foreground/80">
+              Everything a traditional financial institution is not. We
+              provide simpler and more profitable ways to become financially successful and secure in the digital era.
             </p>
+
+            <div className="flex items-center gap-4 mb-8">
+              <Link href="#" className="p-2 bg-card hover:bg-primary/10 rounded-full border border-border transition-all">
+                <Facebook size={18} className="text-muted-foreground hover:text-primary" />
+              </Link>
+              <Link href="#" className="p-2 bg-card hover:bg-primary/10 rounded-full border border-border transition-all">
+                <Twitter size={18} className="text-muted-foreground hover:text-primary" />
+              </Link>
+              <Link href="#" className="p-2 bg-card hover:bg-primary/10 rounded-full border border-border transition-all">
+                <Instagram size={18} className="text-muted-foreground hover:text-primary" />
+              </Link>
+              <Link href="#" className="p-2 bg-card hover:bg-primary/10 rounded-full border border-border transition-all">
+                <Linkedin size={18} className="text-muted-foreground hover:text-primary" />
+              </Link>
+            </div>
 
             <h4 className="text-foreground font-semibold mb-2">
               General Risk Disclaimer
             </h4>
 
-            <p className="text-xs leading-relaxed text-muted-foreground">
+            <p className="text-xs leading-relaxed text-muted-foreground/70">
               Nothing on this website or in our services constitutes a
               solicitation, advice, endorsement, or offer to buy or sell
-              financial instruments by Voltsq GROUP, its agents, employees,
-              contractors, or affiliated entities. You are solely responsible
+              financial instruments by Voltsq GROUP. You are solely responsible
               for evaluating the benefits and risks of using any information or
-              content on this website. All investments carry substantial risk,
-              and investment decisions are solely your responsibility.
-              Information on the website is provided “as is,” without guarantees
-              of completeness, accuracy, timeliness, or results.
+              content. All investments carry substantial risk.
             </p>
           </div>
 
-          {/* MIDDLE – SOCIAL LINKS */}
-          <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-10">
+          {/* MIDDLE – NAVIGATION LINKS */}
+          <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             <div>
-              <h4 className="text-foreground font-semibold mb-4">
+              <h4 className="text-foreground font-semibold mb-6">
                 Social Links
               </h4>
-              <ul className="space-y-3 text-sm">
+              <ul className="space-y-4 text-sm">
                 <li>
                   <Link
-                    href="#"
-                    className="hover:text-primary transition-colors"
+                    href="/"
+                    className="flex items-center gap-2 hover:text-primary transition-all group"
                   >
+                    <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors" />
                     Home
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="#"
-                    className="hover:text-primary transition-colors"
+                    href="/company-pdf.pdf"
+                    className="flex items-center gap-2 hover:text-primary transition-all group"
                   >
+                    <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors" />
                     Company PDF
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="#"
-                    className="hover:text-primary transition-colors"
+                    href="/register"
+                    className="flex items-center gap-2 hover:text-primary transition-all group"
                   >
+                    <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors" />
                     Sign Up
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="#"
-                    className="hover:text-primary transition-colors"
+                    href="/contact-us"
+                    className="flex items-center gap-2 hover:text-primary transition-all group"
                   >
+                    <Headphones size={16} />
                     Get Support
                   </Link>
                 </li>
@@ -85,40 +101,88 @@ export default function Footer() {
             </div>
 
             <div>
-              <h4 className="text-foreground font-semibold mb-4 opacity-0 md:opacity-100">
-                Links
+              <h4 className="text-foreground font-semibold mb-6">
+                Resources
               </h4>
-              <ul className="space-y-3 text-sm">
+              <ul className="space-y-4 text-sm">
                 <li>
                   <Link
-                    href="#"
-                    className="hover:text-primary transition-colors"
+                    href="/about-us"
+                    className="flex items-center gap-2 hover:text-primary transition-all group"
                   >
+                    <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors" />
                     About Us
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="#"
-                    className="hover:text-primary transition-colors"
+                    href="/login"
+                    className="flex items-center gap-2 hover:text-primary transition-all group"
                   >
+                    <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors" />
                     Login
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="#"
-                    className="hover:text-primary transition-colors"
+                    href="/certification"
+                    className="flex items-center gap-2 hover:text-primary transition-all group"
                   >
+                    <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors" />
                     Certification
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="#"
-                    className="hover:text-primary transition-colors"
+                    href="/privacy"
+                    className="flex items-center gap-2 hover:text-primary transition-all group"
                   >
+                    <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors" />
                     Privacy
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-foreground font-semibold mb-6">
+                Services
+              </h4>
+              <ul className="space-y-4 text-sm">
+                <li>
+                  <Link
+                    href="/services"
+                    className="flex items-center gap-2 hover:text-primary transition-all group"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors" />
+                    All Services
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/faqs"
+                    className="flex items-center gap-2 hover:text-primary transition-all group"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors" />
+                    FAQs
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/license"
+                    className="flex items-center gap-2 hover:text-primary transition-all group"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors" />
+                    License
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="mailto:support@voltsq.com"
+                    className="flex items-center gap-2 hover:text-primary transition-all group"
+                  >
+                    <Mail size={16} />
+                    support@voltsq.com
                   </Link>
                 </li>
               </ul>
