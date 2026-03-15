@@ -2,8 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
+import { Box } from "@mui/material";
 
-export default function CryptoTicker() {
+export default function DashboardTicker() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
 
@@ -18,15 +19,12 @@ export default function CryptoTicker() {
     script.async = true;
     script.innerHTML = JSON.stringify({
       symbols: [
-        { proName: "BINANCE:BTCUSDT", title: "Bitcoin" },
-        { proName: "BINANCE:ETHUSDT", title: "Ethereum" },
-        { proName: "BINANCE:SOLUSDT", title: "Solana" },
+        { proName: "BINANCE:BTCUSDT", title: "BTC" },
+        { proName: "BINANCE:ETHUSDT", title: "ETH" },
+        { proName: "BINANCE:SOLUSDT", title: "SOL" },
         { proName: "BINANCE:BNBUSDT", title: "BNB" },
         { proName: "BINANCE:XRPUSDT", title: "XRP" },
-        { proName: "BINANCE:ADAUSDT", title: "Cardano" },
-        { proName: "BINANCE:DOGEUSDT", title: "Dogecoin" },
-        { proName: "BINANCE:DOTUSDT", title: "Polkadot" },
-        { proName: "BINANCE:MATICUSDT", title: "Polygon" },
+        { proName: "BINANCE:ADAUSDT", title: "ADA" },
       ],
       showSymbolLogo: true,
       colorTheme: resolvedTheme === "light" ? "light" : "dark",
@@ -39,10 +37,18 @@ export default function CryptoTicker() {
   }, [resolvedTheme]);
 
   return (
-    <div className="w-full bg-background/50 backdrop-blur-sm border-b border-border overflow-hidden">
+    <Box
+      sx={{
+        width: "100%",
+        overflow: "hidden",
+        "& .tradingview-widget-container": {
+          width: "100%",
+        },
+      }}
+    >
       <div ref={containerRef} className="tradingview-widget-container">
         <div className="tradingview-widget-container__widget"></div>
       </div>
-    </div>
+    </Box>
   );
 }

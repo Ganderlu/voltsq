@@ -125,12 +125,14 @@ function SidebarItem({
             py: 1.2,
             borderRadius: 2.5,
             color: isChildActive ? "#ffffff" : "var(--muted-foreground)",
-            bgcolor: isChildActive ? "rgba(99, 102, 241, 0.08)" : "transparent",
+            bgcolor: isChildActive ? "primary.main" : "transparent",
             cursor: "pointer",
             transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
             "&:hover": {
-              bgcolor: "rgba(255, 255, 255, 0.04)",
-              color: "#ffffff",
+              bgcolor: isChildActive
+                ? "primary.main"
+                : "rgba(99, 102, 241, 0.1)",
+              color: isChildActive ? "#ffffff" : "primary.main",
             },
           }}
         >
@@ -178,8 +180,8 @@ function SidebarItem({
                       transition: "all 0.2s",
                       position: "relative",
                       "&:hover": {
-                        bgcolor: "rgba(255, 255, 255, 0.04)",
-                        color: "#ffffff",
+                        bgcolor: "rgba(99, 102, 241, 0.1)",
+                        color: "primary.main",
                       },
                     }}
                   >
@@ -231,8 +233,8 @@ function SidebarItem({
           boxShadow: isActive ? "0 4px 12px rgba(99, 102, 241, 0.3)" : "none",
           transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
           "&:hover": {
-            bgcolor: isActive ? "primary.main" : "rgba(255, 255, 255, 0.04)",
-            color: "#ffffff",
+            bgcolor: isActive ? "primary.main" : "rgba(99, 102, 241, 0.1)",
+            color: isActive ? "#ffffff" : "primary.main",
           },
         }}
       >
@@ -291,7 +293,7 @@ export default function Sidebar({
             variant="h5"
             fontWeight="900"
             sx={{
-              color: "#ffffff",
+              color: "var(--foreground)",
               letterSpacing: -0.5,
               textTransform: "uppercase",
               fontSize: "1.25rem",
@@ -340,7 +342,7 @@ export default function Sidebar({
                 <Typography
                   variant="body2"
                   fontWeight={600}
-                  sx={{ color: "#ffffff", fontSize: "0.8rem" }}
+                  sx={{ color: "var(--foreground)", fontSize: "0.8rem" }}
                 >
                   Dark Mode
                 </Typography>

@@ -13,6 +13,7 @@ import { Menu as MenuIcon, Search, Settings } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import NotificationBell from "@/app/components/notifications/NotificationBell";
+import DashboardTicker from "./DashboardTicker";
 
 export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   const { currentUser } = useAuth();
@@ -22,7 +23,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
     <Box
       sx={{
         height: 72,
-        px: { xs: 3, md: 5 },
+        px: { xs: 2, md: 5 },
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -31,7 +32,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
         borderColor: "var(--border)",
       }}
     >
-      <Stack direction="row" spacing={2} alignItems="center">
+      <Stack direction="row" spacing={2} alignItems="center" sx={{ flex: 1, minWidth: 0, mr: 2 }}>
         <IconButton
           onClick={onMenuClick}
           sx={{ display: { md: "none" }, color: "var(--muted-foreground)" }}
@@ -39,17 +40,12 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
           <MenuIcon />
         </IconButton>
 
-        {/* Only show welcome on desktop to save space */}
-        <Typography
-          variant="h6"
-          fontWeight={600}
-          sx={{ display: { xs: "none", sm: "block" }, color: "var(--foreground)" }}
-        >
-          Welcome Back!
-        </Typography>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <DashboardTicker />
+        </Box>
       </Stack>
 
-      <Stack direction="row" spacing={3} alignItems="center">
+      <Stack direction="row" spacing={{ xs: 1, md: 3 }} alignItems="center" sx={{ flexShrink: 0 }}>
         {/* <Stack direction="row" spacing={1}>
           <IconButton
             size="small"
@@ -67,9 +63,9 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: 2,
+            gap: { xs: 1, md: 2 },
             ml: 1,
-            pl: 3,
+            pl: { xs: 1, md: 3 },
             borderLeft: "1px solid",
             borderColor: "var(--border)",
           }}

@@ -27,18 +27,18 @@ export default function Home() {
   return (
     <Box sx={{ bgcolor: "var(--background)" }}>
       <Navbar />
+      <CryptoTicker />
       <Hero />
-      {/* <CryptoTicker /> */}
       <VideoSection />
       {/* <CryptoStats /> */}
       <TradeSection />
       <FeatureCards />
       <WhyPrimeMax />
-      {/* <LiveChartSection /> */}
+      <LiveChartSection />
       <CommunitySection />
       <Advisor />
       <PrinciplesSection />
-      {/* <MarketOverviewSection /> */}
+      <MarketOverviewSection />
       <ServicesSection />
       <TestimonialsSection />
       <CreditCard />
