@@ -27,8 +27,8 @@ export default function Home() {
   return (
     <Box sx={{ bgcolor: "var(--background)" }}>
       <Navbar />
-      {/* <CryptoTicker /> */}
       <Hero />
+      {/* <CryptoTicker /> */}
       <VideoSection />
       {/* <CryptoStats /> */}
       <TradeSection />

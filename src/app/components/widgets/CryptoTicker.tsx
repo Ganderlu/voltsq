@@ -10,36 +10,32 @@ export default function CryptoTicker() {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const script = document.createElement("script");
-    script.src =
-      "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js";
-    script.async = true;
-    script.innerHTML = JSON.stringify({
-      symbols: [
-        { proName: "BITSTAMP:BTCUSD", title: "Bitcoin" },
-        { proName: "BITSTAMP:ETHUSD", title: "Ethereum" },
-        { proName: "BITSTAMP:USDTUSD", title: "Tether USDT" },
-        { proName: "BITSTAMP:BNBUSD", title: "BNB" },
-        { proName: "BITSTAMP:SOLUSD", title: "Solana" },
-        { proName: "BITSTAMP:ADAUSD", title: "Cardano" },
-        { proName: "BITSTAMP:XRPUSD", title: "XRP" },
-        { proName: "BITSTAMP:DOGEUSD", title: "Dogecoin" },
-        { proName: "BITSTAMP:LTCUSD", title: "Litecoin" },
-      ],
-      showSymbolLogo: true,
-      colorTheme: resolvedTheme === "light" ? "light" : "dark",
-      isTransparent: false,
-      displayMode: "adaptive",
-      locale: "en",
-    });
-
-    // Clear previous widget before adding new one
+    // Clear previous widget
     containerRef.current.innerHTML = "";
-    containerRef.current.appendChild(script);
+
+    const widgetDiv = document.createElement("div");
+    widgetDiv.style.height = "62px";
+    widgetDiv.style.width = "100%";
+    widgetDiv.style.backgroundColor = resolvedTheme === "light" ? "#FFFFFF" : "#0f172a";
+    widgetDiv.style.overflow = "hidden";
+    
+    const iframe = document.createElement("iframe");
+    iframe.src = `https://widget.coinlib.io/widget/v1/ticker?theme=${resolvedTheme === "light" ? "light" : "dark"}`;
+    iframe.width = "100%";
+    iframe.height = "40px";
+    iframe.scrolling = "auto";
+    iframe.marginWidth = "0";
+    iframe.marginHeight = "0";
+    iframe.frameBorder = "0";
+    iframe.style.border = "0";
+    iframe.style.lineHeight = "14px";
+
+    containerRef.current.appendChild(widgetDiv);
+    widgetDiv.appendChild(iframe);
   }, [resolvedTheme]);
 
   return (
-    <div className="w-full border-b border-border bg-background">
+    <div className="w-full border-b border-border bg-background py-2">
       <div ref={containerRef} />
     </div>
   );
