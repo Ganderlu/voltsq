@@ -11,15 +11,20 @@ import { sendWelcomeEmail } from "../utils/email";
 ========================= */
 export async function saveStep1(formData: FormData) {
   try {
-    const headersList = await headers();
-    const userIp = headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "Unknown";
+    let userIp = "Unknown";
+    try {
+      const headersList = await headers();
+      userIp = headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "Unknown";
+    } catch (hError) {
+      console.warn("⚠️ [saveStep1] Could not retrieve headers:", hError);
+    }
 
     const data = {
-      username: formData.get("username"),
-      fullName: formData.get("fullName"),
-      email: formData.get("email"),
-      phone: formData.get("phone"),
-      referredBy: formData.get("referredBy") || null,
+      username: formData.get("username")?.toString() || "",
+      fullName: formData.get("fullName")?.toString() || "",
+      email: formData.get("email")?.toString() || "",
+      phone: formData.get("phone")?.toString() || "",
+      referredBy: formData.get("referredBy")?.toString() || null,
       step: 1,
       ipAddress: userIp,
       createdAt: new Date(),

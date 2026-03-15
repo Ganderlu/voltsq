@@ -6,9 +6,20 @@ import { getFirestore } from "firebase-admin/firestore";
 let adminApp = null;
 
 try {
-  const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
-    ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-    : null;
+  let serviceAccount = null;
+  const rawKey = process.env.FIREBASE_SERVICE_ACCOUNT;
+
+  if (rawKey) {
+    try {
+      // Handle potential newline issues in Vercel env vars
+      const sanitizedKey = rawKey.replace(/\\n/g, "\n");
+      serviceAccount = JSON.parse(sanitizedKey);
+    } catch (parseError) {
+      console.error("❌ [Firebase Admin] JSON Parse Error:", parseError);
+      // Fallback: try parsing without sanitization if it fails
+      serviceAccount = JSON.parse(rawKey);
+    }
+  }
 
   console.log("🔥 [Firebase Admin] Env Check:");
   console.log(
