@@ -1,10 +1,25 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize lazily to avoid crashing during module load if API key is missing
+let resend: Resend | null = null;
+
+function getResend() {
+  if (!resend && process.env.RESEND_API_KEY) {
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resend;
+}
 
 export async function sendWelcomeEmail(email: string, fullName: string) {
   try {
-    const { data, error } = await resend.emails.send({
+    const resendClient = getResend();
+    
+    if (!resendClient) {
+      console.warn('⚠️ [Email] Resend API key missing. Skipping email.');
+      return { success: false, error: 'API key missing' };
+    }
+
+    const { data, error } = await resendClient.emails.send({
       from: 'Voltsq Investments <onboarding@resend.dev>', // Replace with your verified domain
       to: [email],
       subject: 'Welcome to Voltsq Investments! 🚀',
