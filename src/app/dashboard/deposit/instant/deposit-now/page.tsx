@@ -24,15 +24,14 @@ import { db } from "@/app/firebase/firebaseClient";
 import { ArrowLeft, Info } from "lucide-react";
 
 const WALLET_MAP: Record<string, { network: string; address: string }[]> = {
-  bitcoin: [{ network: "BTC", address: "1Nx5hR6WdKULtpB7PZN64Kbzu8HP3MhYtV" }],
-  ethereum: [{ network: "ERC20", address: "0xf311ac9df89e6c5663a49438971c8e7403af6642" }],
-  "bnb smart chain": [{ network: "BEP20", address: "0xf311ac9df89e6c5663a49438971c8e7403af6642" }],
-  tron: [{ network: "TRC20", address: "TEFHSDaGkvgycMZqL28NiFekygVEuKNLqW" }],
+  bitcoin: [{ network: "BTC", address: "bc1qpj0v3t5vy59f53zssfk97ke5pa43pzj93rqcmv" }],
+  ethereum: [{ network: "ERC20", address: "0x0d25Fd5c383e60BD9161466388a9Fe8d7A1CD64b" }],
+  "bnb smart chain": [{ network: "BEP20", address: "0x0d25Fd5c383e60BD9161466388a9Fe8d7A1CD64b" }],
+  tron: [{ network: "TRC20", address: "TEbzLKYdWKpmw9MULZKJrZdNFtNTzd8taz" }],
   usdt: [
-    { network: "TRC20", address: "TEFHSDaGkvgycMZqL28NiFekygVEuKNLqW" },
-    { network: "ERC20", address: "0xf311ac9df89e6c5663a49438971c8e7403af6642" },
+    { network: "TRC20", address: "TEbzLKYdWKpmw9MULZKJrZdNFtNTzd8taz" }
   ],
-  solana: [{ network: "SOL", address: "GXYQcxvitv5pUgvoapX5W3zKhE5W6gZqUNnQLYYnu5dH" }],
+  solana: [{ network: "SOL", address: "7AQfzDdWcSs3GnYJwZ1d2RaxaeXhhfpWixk4JCohVqLh" }],
 };
 
 export default function DepositNowPage() {
