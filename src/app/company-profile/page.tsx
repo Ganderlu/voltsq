@@ -170,7 +170,7 @@ export default function CompanyProfilePage() {
 
           {/* MISSION & VISION */}
           <Grid container spacing={6} sx={{ mb: 10 }}>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Box
                 sx={{
                   p: 4,
@@ -208,7 +208,7 @@ export default function CompanyProfilePage() {
                 </Typography>
               </Box>
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Box
                 sx={{
                   p: 4,
@@ -279,7 +279,7 @@ export default function CompanyProfilePage() {
                   icon: <Users size={28} />,
                 },
               ].map((item, idx) => (
-                <Grid item xs={12} sm={6} key={idx}>
+                <Grid size={{ xs: 12, sm: 6 }} key={idx}>
                   <Stack spacing={2}>
                     <Box sx={{ color: "var(--primary)" }}>{item.icon}</Box>
                     <Typography
@@ -324,8 +324,12 @@ export default function CompanyProfilePage() {
             >
               Primary Investment Sectors
             </Typography>
-            <Typography variant="body1" sx={{ mb: 6, opacity: 0.8, color: "#fff" }}>
-              Voltsq focuses on four core pillars to deliver superior financial results and transparency:
+            <Typography
+              variant="body1"
+              sx={{ mb: 6, opacity: 0.8, color: "#fff" }}
+            >
+              Voltsq focuses on four core pillars to deliver superior financial
+              results and transparency:
             </Typography>
             <Grid container spacing={4}>
               {[
@@ -346,186 +350,379 @@ export default function CompanyProfilePage() {
                   desc: "Strategic market execution across multiple asset classes, focused on precision, security, and consistent results.",
                 },
               ].map((sector, idx) => (
-                  <Grid item xs={12} sm={6} key={idx}>
-                    <Box sx={{ borderLeft: "3px solid var(--primary)", pl: 3 }}>
+                <Grid size={{ xs: 12, sm: 6 }} key={idx}>
+                  <Box sx={{ borderLeft: "3px solid var(--primary)", pl: 3 }}>
+                    <Typography
+                      variant="h6"
+                      sx={{ fontWeight: 700, mb: 1, color: "#fff" }}
+                    >
+                      {sector.title}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ opacity: 0.7, color: "#fff" }}
+                    >
+                      {sector.desc}
+                    </Typography>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+
+          {/* INVESTMENT PLANS */}
+          <Box sx={{ mb: 10 }}>
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: 700, mb: 6, color: "inherit" }}
+            >
+              Exclusive Investment Plans
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                mb: 6,
+                opacity: 0.9,
+                lineHeight: 1.8,
+                color: "inherit",
+                "@media print": { color: "#333 !important" },
+              }}
+            >
+              Voltsq offers a range of meticulously designed investment plans to
+              cater to various financial goals and capital sizes. Each plan is
+              engineered for maximum stability and consistent returns.
+            </Typography>
+            <Grid container spacing={4}>
+              {[
+                {
+                  name: "Rare Plan",
+                  rate: "3% Daily",
+                  range: "$100 - $999",
+                  desc: "Perfect for entry-level investors looking to start their digital asset journey. This plan offers a steady 3% daily return with access to our real-time market dashboard and 24/7 standard support.",
+                },
+                {
+                  name: "Business Plan",
+                  rate: "10% Daily",
+                  range: "$1,000 - $9,999",
+                  desc: "Designed for active traders, the Business Plan provides a significant 10% daily return. It includes priority fast-track support, monthly portfolio reviews, and advanced risk management tools.",
+                },
+                {
+                  name: "Gold Plan",
+                  rate: "15% Daily",
+                  range: "$10,000 - $49,999",
+                  desc: "Our VIP-tier plan for substantial portfolios. Enjoy a 15% daily return, a dedicated senior account manager, instant withdrawal processing, and exclusive networking event invitations.",
+                },
+                {
+                  name: "Real Estate Plan",
+                  rate: "20% Weekly",
+                  range: "$50,000 - $400,000",
+                  desc: "Focused on institutional-grade fractional property ownership. This plan offers a 20% weekly yield with direct ownership benefits and expert tax optimization consultations.",
+                },
+                {
+                  name: "Promo Plan",
+                  rate: "30% Weekly",
+                  range: "$2,000 (Fixed)",
+                  desc: "A high-yield promotional opportunity with a fixed entry. It guarantees a 30% weekly return with principal protection and automated daily profit distributions for maximum efficiency.",
+                },
+                {
+                  name: "Joint Investment Plan",
+                  rate: "50% Daily",
+                  range: "$10,000 - $30,000",
+                  desc: "Our most aggressive growth plan focused on collaborative wealth building. It delivers a staggering 50% daily return through shared risk-and-reward structures and monthly joint strategy meetings.",
+                },
+              ].map((plan, idx) => (
+                <Grid size={{ xs: 12, md: 6 }} key={idx}>
+                  <Box
+                    sx={{
+                      p: 4,
+                      bgcolor: "var(--secondary)",
+                      borderRadius: "16px",
+                      border: "1px solid var(--border)",
+                      height: "100%",
+                      "@media print": {
+                        bgcolor: "#fff !important",
+                        border: "1px solid #eee !important",
+                      },
+                    }}
+                  >
+                    <Stack
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      sx={{ mb: 2 }}
+                    >
                       <Typography
                         variant="h6"
-                        sx={{ fontWeight: 700, mb: 1, color: "#fff" }}
+                        sx={{ fontWeight: 800, color: "var(--primary)" }}
                       >
-                        {sector.title}
+                        {plan.name}
                       </Typography>
-                      <Typography variant="body2" sx={{ opacity: 0.7, color: "#fff" }}>
-                        {sector.desc}
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: 700,
+                          color: "inherit",
+                          px: 1.5,
+                          py: 0.5,
+                          bgcolor: "var(--background)",
+                          borderRadius: "20px",
+                          border: "1px solid var(--border)",
+                          "@media print": { bgcolor: "#f0f0f0 !important" },
+                        }}
+                      >
+                        {plan.rate}
                       </Typography>
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
+                    </Stack>
+                    <Typography
+                      variant="body2"
+                      sx={{ fontWeight: 700, mb: 2, color: "inherit" }}
+                    >
+                      Entry: {plan.range}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "var(--muted-foreground)",
+                        lineHeight: 1.7,
+                        "@media print": { color: "#555 !important" },
+                      }}
+                    >
+                      {plan.desc}
+                    </Typography>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
 
-            {/* INVESTMENT PLANS */}
-            <Box sx={{ mb: 10 }}>
-              <Typography variant="h4" sx={{ fontWeight: 700, mb: 6, color: "inherit" }}>
-                Exclusive Investment Plans
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 6, opacity: 0.9, lineHeight: 1.8, color: "inherit", "@media print": { color: "#333 !important" } }}>
-                Voltsq offers a range of meticulously designed investment plans to cater to various financial goals and capital sizes. Each plan is engineered for maximum stability and consistent returns.
-              </Typography>
-              <Grid container spacing={4}>
-                {[
-                  {
-                    name: "Rare Plan",
-                    rate: "3% Daily",
-                    range: "$100 - $999",
-                    desc: "Perfect for entry-level investors looking to start their digital asset journey. This plan offers a steady 3% daily return with access to our real-time market dashboard and 24/7 standard support.",
-                  },
-                  {
-                    name: "Business Plan",
-                    rate: "10% Daily",
-                    range: "$1,000 - $9,999",
-                    desc: "Designed for active traders, the Business Plan provides a significant 10% daily return. It includes priority fast-track support, monthly portfolio reviews, and advanced risk management tools.",
-                  },
-                  {
-                    name: "Gold Plan",
-                    rate: "15% Daily",
-                    range: "$10,000 - $49,999",
-                    desc: "Our VIP-tier plan for substantial portfolios. Enjoy a 15% daily return, a dedicated senior account manager, instant withdrawal processing, and exclusive networking event invitations.",
-                  },
-                  {
-                    name: "Real Estate Plan",
-                    rate: "20% Weekly",
-                    range: "$50,000 - $400,000",
-                    desc: "Focused on institutional-grade fractional property ownership. This plan offers a 20% weekly yield with direct ownership benefits and expert tax optimization consultations.",
-                  },
-                  {
-                    name: "Promo Plan",
-                    rate: "30% Weekly",
-                    range: "$2,000 (Fixed)",
-                    desc: "A high-yield promotional opportunity with a fixed entry. It guarantees a 30% weekly return with principal protection and automated daily profit distributions for maximum efficiency.",
-                  },
-                  {
-                    name: "Joint Investment Plan",
-                    rate: "50% Daily",
-                    range: "$10,000 - $30,000",
-                    desc: "Our most aggressive growth plan focused on collaborative wealth building. It delivers a staggering 50% daily return through shared risk-and-reward structures and monthly joint strategy meetings.",
-                  },
-                ].map((plan, idx) => (
-                  <Grid item xs={12} md={6} key={idx}>
-                    <Box sx={{ p: 4, bgcolor: "var(--secondary)", borderRadius: "16px", border: "1px solid var(--border)", height: "100%", "@media print": { bgcolor: "#fff !important", border: "1px solid #eee !important" } }}>
-                      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 800, color: "var(--primary)" }}>{plan.name}</Typography>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "inherit", px: 1.5, py: 0.5, bgcolor: "var(--background)", borderRadius: "20px", border: "1px solid var(--border)", "@media print": { bgcolor: "#f0f0f0 !important" } }}>{plan.rate}</Typography>
-                      </Stack>
-                      <Typography variant="body2" sx={{ fontWeight: 700, mb: 2, color: "inherit" }}>Entry: {plan.range}</Typography>
-                      <Typography variant="body2" sx={{ color: "var(--muted-foreground)", lineHeight: 1.7, "@media print": { color: "#555 !important" } }}>{plan.desc}</Typography>
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
+          {/* WHY CHOOSE US */}
+          <Box sx={{ mb: 10 }}>
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: 700, mb: 6, color: "inherit" }}
+            >
+              Why Choose Voltsq
+            </Typography>
+            <Grid container spacing={4}>
+              {[
+                {
+                  title: "Advanced Technology",
+                  desc: "Our proprietary trading algorithms and real-time data analytics give our investors a competitive edge in the global markets.",
+                },
+                {
+                  title: "Security First",
+                  desc: "We prioritize the safety of your assets with top-tier encryption, Firebase-backed authentication, and strict regulatory compliance.",
+                },
+                {
+                  title: "Diverse Portfolio",
+                  desc: "From Forex and Stocks to Real Estate and Emerging Markets, we provide access to a wide range of profitable investment vehicles.",
+                },
+                {
+                  title: "Expert Guidance",
+                  desc: "Our team of seasoned financial advisors and market analysts provide the insights needed to navigate complex financial landscapes.",
+                },
+              ].map((item, idx) => (
+                <Grid size={{ xs: 12, sm: 6 }} key={idx}>
+                  <Box
+                    sx={{
+                      p: 4,
+                      bgcolor: "var(--secondary)",
+                      borderRadius: "12px",
+                      border: "1px solid var(--border)",
+                      "@media print": {
+                        bgcolor: "#f9f9f9 !important",
+                        border: "1px solid #eee !important",
+                      },
+                    }}
+                  >
+                    <Typography
+                      variant="h6"
+                      sx={{ fontWeight: 700, mb: 2, color: "inherit" }}
+                    >
+                      {item.title}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "var(--muted-foreground)",
+                        lineHeight: 1.6,
+                        "@media print": { color: "#666 !important" },
+                      }}
+                    >
+                      {item.desc}
+                    </Typography>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
 
-            {/* WHY CHOOSE US */}
-            <Box sx={{ mb: 10 }}>
-              <Typography variant="h4" sx={{ fontWeight: 700, mb: 6, color: "inherit" }}>
-                Why Choose Voltsq 
-              </Typography>
-              <Grid container spacing={4}>
-                {[
-                  {
-                    title: "Advanced Technology",
-                    desc: "Our proprietary trading algorithms and real-time data analytics give our investors a competitive edge in the global markets.",
-                  },
-                  {
-                    title: "Security First",
-                    desc: "We prioritize the safety of your assets with top-tier encryption, Firebase-backed authentication, and strict regulatory compliance.",
-                  },
-                  {
-                    title: "Diverse Portfolio",
-                    desc: "From Forex and Stocks to Real Estate and Emerging Markets, we provide access to a wide range of profitable investment vehicles.",
-                  },
-                  {
-                    title: "Expert Guidance",
-                    desc: "Our team of seasoned financial advisors and market analysts provide the insights needed to navigate complex financial landscapes.",
-                  },
-                ].map((item, idx) => (
-                  <Grid item xs={12} sm={6} key={idx}>
-                    <Box sx={{ p: 4, bgcolor: "var(--secondary)", borderRadius: "12px", border: "1px solid var(--border)", "@media print": { bgcolor: "#f9f9f9 !important", border: "1px solid #eee !important" } }}>
-                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: "inherit" }}>
-                        {item.title}
-                      </Typography>
-                      <Typography variant="body2" sx={{ color: "var(--muted-foreground)", lineHeight: 1.6, "@media print": { color: "#666 !important" } }}>
-                        {item.desc}
-                      </Typography>
+          {/* TEAM MEMBERS */}
+          <Box sx={{ mb: 10 }}>
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: 700, mb: 6, color: "inherit" }}
+            >
+              Our Leadership Team
+            </Typography>
+            <Grid container spacing={4}>
+              {[
+                {
+                  name: "Thomas Kralow",
+                  role: "Financial Adviser",
+                  desc: "A world-renowned trader and financial educator with over a decade of market experience.",
+                },
+                {
+                  name: "Alexander Volkov",
+                  role: "Chief Executive Officer",
+                  desc: "Leading the strategic vision and global expansion of Voltsq Investments.",
+                },
+                {
+                  name: "Sarah Jenkins",
+                  role: "Head of Trading Strategy",
+                  desc: "Specializing in algorithmic trading and risk management across multiple asset classes.",
+                },
+                {
+                  name: "Marcus Thorne",
+                  role: "Chief Technology Officer",
+                  desc: "Architecting the secure and scalable infrastructure that powers our investment platform.",
+                },
+              ].map((member, idx) => (
+                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={idx}>
+                  <Box sx={{ textAlign: "center" }}>
+                    <Box
+                      sx={{
+                        width: "80px",
+                        height: "80px",
+                        bgcolor: "var(--primary)",
+                        borderRadius: "50%",
+                        mx: "auto",
+                        mb: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#fff",
+                        fontWeight: 800,
+                        fontSize: "24px",
+                      }}
+                    >
+                      {member.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
                     </Box>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{ fontWeight: 700, color: "inherit" }}
+                    >
+                      {member.name}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "var(--primary)",
+                        fontWeight: 600,
+                        display: "block",
+                        mb: 1,
+                      }}
+                    >
+                      {member.role}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "var(--muted-foreground)",
+                        fontSize: "0.8rem",
+                        lineHeight: 1.4,
+                        "@media print": { color: "#777 !important" },
+                      }}
+                    >
+                      {member.desc}
+                    </Typography>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
 
-            {/* TEAM MEMBERS */}
-            <Box sx={{ mb: 10 }}>
-              <Typography variant="h4" sx={{ fontWeight: 700, mb: 6, color: "inherit" }}>
-                Our Leadership Team
-              </Typography>
-              <Grid container spacing={4}>
-                {[
-                  { name: "Thomas Kralow", role: "Financial Adviser", desc: "A world-renowned trader and financial educator with over a decade of market experience." },
-                  { name: "Alexander Volkov", role: "Chief Executive Officer", desc: "Leading the strategic vision and global expansion of Voltsq Investments." },
-                  { name: "Sarah Jenkins", role: "Head of Trading Strategy", desc: "Specializing in algorithmic trading and risk management across multiple asset classes." },
-                  { name: "Marcus Thorne", role: "Chief Technology Officer", desc: "Architecting the secure and scalable infrastructure that powers our investment platform." },
-                ].map((member, idx) => (
-                  <Grid item xs={12} sm={6} md={3} key={idx}>
-                    <Box sx={{ textAlign: "center" }}>
-                      <Box sx={{ width: "80px", height: "80px", bgcolor: "var(--primary)", borderRadius: "50%", mx: "auto", mb: 2, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontSize: "24px" }}>
-                        {member.name.split(" ").map(n => n[0]).join("")}
-                      </Box>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "inherit" }}>{member.name}</Typography>
-                      <Typography variant="caption" sx={{ color: "var(--primary)", fontWeight: 600, display: "block", mb: 1 }}>{member.role}</Typography>
-                      <Typography variant="body2" sx={{ color: "var(--muted-foreground)", fontSize: "0.8rem", lineHeight: 1.4, "@media print": { color: "#777 !important" } }}>{member.desc}</Typography>
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
+          {/* TESTIMONIALS */}
+          <Box sx={{ mb: 10 }}>
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: 700, mb: 6, color: "inherit" }}
+            >
+              What Our Investors Say
+            </Typography>
+            <Grid container spacing={4}>
+              {[
+                {
+                  name: "James Wilson",
+                  role: "Professional Trader",
+                  content:
+                    "Voltsq has completely transformed my approach to digital assets. Their security protocols and intuitive interface are second to none in the industry.",
+                },
+                {
+                  name: "Sarah Chen",
+                  role: "Portfolio Manager",
+                  content:
+                    "The real-time insights and automated trading features have helped me consistently outperform the market. Highly recommended for serious investors.",
+                },
+                {
+                  name: "David Thompson",
+                  role: "Strategic Investor",
+                  content:
+                    "Transparency is key for me, and Voltsq delivers. Every transaction is clear, and the performance reports are incredibly detailed.",
+                },
+              ].map((t, idx) => (
+                <Grid size={{ xs: 12, md: 4 }} key={idx}>
+                  <Box
+                    sx={{
+                      p: 4,
+                      bgcolor: "var(--card)",
+                      border: "1px solid var(--border)",
+                      borderRadius: "16px",
+                      height: "100%",
+                      "@media print": {
+                        bgcolor: "#fff !important",
+                        border: "1px solid #eee !important",
+                      },
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontStyle: "italic",
+                        mb: 3,
+                        color: "inherit",
+                        opacity: 0.9,
+                        lineHeight: 1.6,
+                        "@media print": { color: "#444 !important" },
+                      }}
+                    >
+                      "{t.content}"
+                    </Typography>
+                    <Divider sx={{ mb: 2, borderColor: "var(--border)" }} />
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ fontWeight: 700, color: "inherit" }}
+                    >
+                      {t.name}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "var(--muted-foreground)",
+                        "@media print": { color: "#888 !important" },
+                      }}
+                    >
+                      {t.role}
+                    </Typography>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
 
-            {/* TESTIMONIALS */}
-            <Box sx={{ mb: 10 }}>
-              <Typography variant="h4" sx={{ fontWeight: 700, mb: 6, color: "inherit" }}>
-                What Our Investors Say
-              </Typography>
-              <Grid container spacing={4}>
-                {[
-                  {
-                    name: "James Wilson",
-                    role: "Professional Trader",
-                    content: "Voltsq has completely transformed my approach to digital assets. Their security protocols and intuitive interface are second to none in the industry.",
-                  },
-                  {
-                    name: "Sarah Chen",
-                    role: "Portfolio Manager",
-                    content: "The real-time insights and automated trading features have helped me consistently outperform the market. Highly recommended for serious investors.",
-                  },
-                  {
-                    name: "David Thompson",
-                    role: "Strategic Investor",
-                    content: "Transparency is key for me, and Voltsq delivers. Every transaction is clear, and the performance reports are incredibly detailed.",
-                  }
-                ].map((t, idx) => (
-                  <Grid item xs={12} md={4} key={idx}>
-                    <Box sx={{ p: 4, bgcolor: "var(--card)", border: "1px solid var(--border)", borderRadius: "16px", height: "100%", "@media print": { bgcolor: "#fff !important", border: "1px solid #eee !important" } }}>
-                      <Typography sx={{ fontStyle: "italic", mb: 3, color: "inherit", opacity: 0.9, lineHeight: 1.6, "@media print": { color: "#444 !important" } }}>
-                        "{t.content}"
-                      </Typography>
-                      <Divider sx={{ mb: 2, borderColor: "var(--border)" }} />
-                      <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "inherit" }}>{t.name}</Typography>
-                      <Typography variant="caption" sx={{ color: "var(--muted-foreground)", "@media print": { color: "#888 !important" } }}>{t.role}</Typography>
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
-
-            {/* GLOBAL IMPACT */}
+          {/* GLOBAL IMPACT */}
           <Box sx={{ mb: 10 }}>
             <Typography
               variant="h4"
@@ -540,7 +737,7 @@ export default function CompanyProfilePage() {
                 { label: "Assets Managed", val: "$50M+" },
                 { label: "Traders Globally", val: "15,000+" },
               ].map((stat, idx) => (
-                <Grid item xs={6} md={3} key={idx}>
+                <Grid size={{ xs: 6, md: 3 }} key={idx}>
                   <Typography
                     variant="h3"
                     sx={{ fontWeight: 800, color: "var(--primary)", mb: 1 }}
@@ -596,7 +793,7 @@ export default function CompanyProfilePage() {
           {/* FOOTER OF DOC */}
           <Divider sx={{ mb: 6, borderColor: "var(--border)" }} />
           <Grid container justifyContent="space-between" alignItems="center">
-            <Grid item>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Typography
                 variant="body2"
                 sx={{ fontWeight: 700, color: "inherit" }}
@@ -613,7 +810,10 @@ export default function CompanyProfilePage() {
                 Official Company Documentation · © 2026
               </Typography>
             </Grid>
-            <Grid item>
+            <Grid
+              size={{ xs: 12, sm: 6 }}
+              sx={{ textAlign: { xs: "left", sm: "right" } }}
+            >
               <Typography
                 variant="body2"
                 sx={{
