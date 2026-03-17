@@ -8,10 +8,23 @@ export default function VideoSection() {
 
   useEffect(() => {
     if (videoRef.current) {
+      // Ensure video is muted to allow autoplay on most browsers
       videoRef.current.muted = true;
-      videoRef.current.play().catch((error) => {
-        console.error("Video play failed:", error);
-      });
+      videoRef.current.defaultMuted = true;
+
+      const playVideo = async () => {
+        try {
+          await videoRef.current?.play();
+        } catch (error) {
+          console.warn(
+            "Initial video play failed, retrying after interaction:",
+            error,
+          );
+          // Some browsers block autoplay even if muted until first interaction
+        }
+      };
+
+      playVideo();
     }
   }, []);
 
@@ -64,6 +77,7 @@ export default function VideoSection() {
             muted
             playsInline
             controls
+            preload="auto"
             style={{
               width: "100%",
               height: "100%",
