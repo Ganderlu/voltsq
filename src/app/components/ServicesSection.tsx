@@ -5,15 +5,15 @@ import { useLanguage } from "@/context/LanguageContext";
 
 const services = [
   {
-    title: "Real State",
+    title: "Investment",
     image: "/images/real.jpg",
   },
   {
-    title: "Gold",
+    title: "Metrics",
     image: "/images/gold.webp",
   },
   {
-    title: "Cannabis",
+    title: "Trades",
     image: "/images/cannabis.webp",
   },
   {

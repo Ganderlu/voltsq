@@ -72,7 +72,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/company-pdf.pdf"
+                    href="/company-profile"
                     className="flex items-center gap-2 hover:text-primary transition-all group"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-border group-hover:bg-primary transition-colors" />

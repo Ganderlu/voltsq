@@ -1,8 +1,20 @@
 "use client";
 
 import { Box, Container, Typography } from "@mui/material";
+import { useEffect, useRef } from "react";
 
 export default function VideoSection() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = true;
+      videoRef.current.play().catch((error) => {
+        console.error("Video play failed:", error);
+      });
+    }
+  }, []);
+
   return (
     <Box sx={{ bgcolor: "var(--background)", py: { xs: 6, md: 10 } }}>
       <Container maxWidth="lg">
@@ -12,7 +24,8 @@ export default function VideoSection() {
             sx={{
               fontWeight: 800,
               mb: 2,
-              background: "linear-gradient(to right, var(--foreground), var(--primary))",
+              background:
+                "linear-gradient(to right, var(--foreground), var(--primary))",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
             }}
@@ -21,9 +34,14 @@ export default function VideoSection() {
           </Typography>
           <Typography
             variant="h6"
-            sx={{ color: "var(--muted-foreground)", maxWidth: "800px", mx: "auto" }}
+            sx={{
+              color: "var(--muted-foreground)",
+              maxWidth: "800px",
+              mx: "auto",
+            }}
           >
-            See how Voltsq Investments is revolutionizing the digital asset landscape with cutting-edge technology and secure strategies.
+            See how Voltsq Investments is revolutionizing the digital asset
+            landscape with cutting-edge technology and secure strategies.
           </Typography>
         </Box>
 
@@ -40,6 +58,7 @@ export default function VideoSection() {
           }}
         >
           <video
+            ref={videoRef}
             autoPlay
             loop
             muted
