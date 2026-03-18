@@ -12,9 +12,30 @@ import { sendWelcomeEmail } from "../utils/email";
 export async function saveStep1(formData: FormData) {
   try {
     let userIp = "Unknown";
+    let country = "Unknown";
+
     try {
       const headersList = await headers();
-      userIp = headersList.get("x-forwarded-for") || headersList.get("x-real-ip") || "Unknown";
+      // Try multiple headers to get the real IP
+      const forwardedFor = headersList.get("x-forwarded-for");
+      if (forwardedFor) {
+        userIp = forwardedFor.split(",")[0].trim();
+      } else {
+        userIp = headersList.get("x-real-ip") || "Unknown";
+      }
+
+      // If IP is known, attempt to fetch geolocation
+      if (userIp !== "Unknown" && userIp !== "127.0.0.1" && userIp !== "::1") {
+        try {
+          const geoRes = await fetch(`https://ipapi.co/${userIp}/json/`);
+          if (geoRes.ok) {
+            const geoData = await geoRes.json();
+            country = geoData.country_name || geoData.country || "Unknown";
+          }
+        } catch (geoError) {
+          console.warn("⚠️ [saveStep1] Geolocation fetch failed:", geoError);
+        }
+      }
     } catch (hError) {
       console.warn("⚠️ [saveStep1] Could not retrieve headers:", hError);
     }
@@ -27,6 +48,7 @@ export async function saveStep1(formData: FormData) {
       referredBy: formData.get("referredBy")?.toString() || null,
       step: 1,
       ipAddress: userIp,
+      detectedCountry: country, // Store initial auto-detected country
       createdAt: new Date(),
     };
 
@@ -121,6 +143,7 @@ export async function completeRegistration(formData: FormData) {
     email: string;
     phone: string;
     country: string;
+    detectedCountry: string;
     referredBy: string | null;
     ipAddress: string;
   };
@@ -144,7 +167,8 @@ export async function completeRegistration(formData: FormData) {
         fullName: data.fullName,
         email: data.email,
         phone: data.phone || "",
-        country: data.country,
+        country: data.country, // User-selected country
+        detectedCountry: data.detectedCountry || "Unknown", // Real location based on IP
         referredBy: data.referredBy || null,
         ipAddress: data.ipAddress || "Unknown",
         mode: "demo",

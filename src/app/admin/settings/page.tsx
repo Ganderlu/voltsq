@@ -127,7 +127,7 @@ export default function AdminSettingsPage() {
               p: 3,
               bgcolor: "var(--card)",
               border: "1px solid",
-              borderColor: "#000000",
+              borderColor: "var(--border)",
               borderRadius: 4,
             }}
           >
@@ -231,7 +231,7 @@ export default function AdminSettingsPage() {
               p: 3,
               bgcolor: "var(--card)",
               border: "1px solid",
-              borderColor: "#000000",
+              borderColor: "var(--border)",
               borderRadius: 4,
             }}
           >

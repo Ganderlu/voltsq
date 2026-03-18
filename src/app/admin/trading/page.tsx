@@ -140,7 +140,7 @@ export default function AdminTradingPage() {
 
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <Paper elevation={0} sx={{ p: 3, bgcolor: "var(--card)", border: "1px solid", borderColor: "#000000", borderRadius: 4, display: "flex", alignItems: "center", gap: 2 }}>
+          <Paper elevation={0} sx={{ p: 3, bgcolor: "var(--card)", border: "1px solid", borderColor: "var(--border)", borderRadius: 4, display: "flex", alignItems: "center", gap: 2 }}>
             <Box sx={{ p: 1.2, borderRadius: 2.5, bgcolor: "rgba(234,179,8,0.12)", color: "#eab308", display: "flex" }}>
               <Timer size={18} />
             </Box>
@@ -151,7 +151,7 @@ export default function AdminTradingPage() {
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <Paper elevation={0} sx={{ p: 3, bgcolor: "var(--card)", border: "1px solid", borderColor: "#000000", borderRadius: 4, display: "flex", alignItems: "center", gap: 2 }}>
+          <Paper elevation={0} sx={{ p: 3, bgcolor: "var(--card)", border: "1px solid", borderColor: "var(--border)", borderRadius: 4, display: "flex", alignItems: "center", gap: 2 }}>
             <Box sx={{ p: 1.2, borderRadius: 2.5, bgcolor: "rgba(34,197,94,0.12)", color: "#22c55e", display: "flex" }}>
               <TrendingUp size={18} />
             </Box>
@@ -162,7 +162,7 @@ export default function AdminTradingPage() {
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <Paper elevation={0} sx={{ p: 3, bgcolor: "var(--card)", border: "1px solid", borderColor: "#000000", borderRadius: 4, display: "flex", alignItems: "center", gap: 2 }}>
+          <Paper elevation={0} sx={{ p: 3, bgcolor: "var(--card)", border: "1px solid", borderColor: "var(--border)", borderRadius: 4, display: "flex", alignItems: "center", gap: 2 }}>
             <Box sx={{ p: 1.2, borderRadius: 2.5, bgcolor: "rgba(239,68,68,0.12)", color: "#ef4444", display: "flex" }}>
               <TrendingDown size={18} />
             </Box>
@@ -173,7 +173,7 @@ export default function AdminTradingPage() {
           </Paper>
         </Grid>
         <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <Paper elevation={0} sx={{ p: 3, bgcolor: "var(--card)", border: "1px solid", borderColor: "#000000", borderRadius: 4, display: "flex", alignItems: "center", gap: 2 }}>
+          <Paper elevation={0} sx={{ p: 3, bgcolor: "var(--card)", border: "1px solid", borderColor: "var(--border)", borderRadius: 4, display: "flex", alignItems: "center", gap: 2 }}>
             <Box sx={{ p: 1.2, borderRadius: 2.5, bgcolor: "rgba(59,130,246,0.12)", color: "#3b82f6", display: "flex" }}>
               <Wallet size={18} />
             </Box>
@@ -185,7 +185,7 @@ export default function AdminTradingPage() {
         </Grid>
       </Grid>
 
-      <Paper elevation={0} sx={{ p: 2, mb: 3, bgcolor: "var(--card)", border: "1px solid", borderColor: "#000000", borderRadius: 4 }}>
+      <Paper elevation={0} sx={{ p: 2, mb: 3, bgcolor: "var(--card)", border: "1px solid", borderColor: "var(--border)", borderRadius: 4 }}>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, md: 6 }}>
             <TextField

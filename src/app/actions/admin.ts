@@ -197,3 +197,19 @@ export async function settleInvestment(investmentId: string) {
 
   return { success: true };
 }
+
+export async function toggleAdminStatus(uid: string, isAdmin: boolean) {
+  if (!adminDb) throw new Error("Admin DB not initialized");
+
+  const adminRef = adminDb.doc(`admins/${uid}`);
+  if (isAdmin) {
+    await adminRef.set({
+      uid,
+      createdAt: new Date(),
+    });
+  } else {
+    await adminRef.delete();
+  }
+
+  return { success: true };
+}

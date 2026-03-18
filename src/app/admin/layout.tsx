@@ -32,19 +32,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [currentUser]);
 
   useEffect(() => {
-    const isLogin = pathname === "/admin/login";
+    const isLogin = pathname === "/login";
     if (adminAllowed === false && !isLogin) {
-      router.replace("/admin/login");
+      router.replace("/login");
     }
   }, [adminAllowed, pathname, router]);
 
   const sidebarDisabled = useMemo(() => {
-    const isLogin = pathname === "/admin/login";
+    const isLogin = pathname === "/login";
     return isLogin || adminAllowed === false || adminAllowed === null;
   }, [pathname, adminAllowed]);
 
   return (
-    <Box display="flex" minHeight="100vh" bgcolor="background.default">
+    <Box display="flex" minHeight="100vh" bgcolor="var(--background)">
       <Sidebar open={open} onClose={() => setOpen(false)} disabled={sidebarDisabled} />
       <Box flex={1}>
         <Header onMenu={() => setOpen(true)} />

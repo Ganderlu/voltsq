@@ -19,11 +19,16 @@ export default async function ManageUsersPage() {
   }
 
   try {
-    const snapshot = await adminDb
-      .collection("users")
-      .orderBy("createdAt", "desc")
-      .limit(50) // Increased limit for better management
-      .get();
+    const [snapshot, adminSnapshot] = await Promise.all([
+      adminDb
+        .collection("users")
+        .orderBy("createdAt", "desc")
+        .limit(50) // Increased limit for better management
+        .get(),
+      adminDb.collection("admins").get(),
+    ]);
+
+    const adminIds = new Set(adminSnapshot.docs.map((doc) => doc.id));
 
     const users = snapshot.docs.map((doc: QueryDocumentSnapshot) => {
       const data = doc.data();
@@ -53,6 +58,8 @@ export default async function ManageUsersPage() {
         walletBalance: Number(data.walletBalance ?? 0),
         ipAddress: data.ipAddress || "N/A",
         country: data.country || "N/A",
+        detectedCountry: data.detectedCountry || "N/A",
+        isAdmin: adminIds.has(doc.id),
       };
     });
 

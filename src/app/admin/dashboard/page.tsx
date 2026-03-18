@@ -140,10 +140,13 @@ export default function AdminDashboard() {
 
   return (
     <Box
+      component="main"
       sx={{
         minHeight: "100vh",
         bgcolor: "var(--background)",
+        color: "var(--foreground)",
         p: { xs: 2, md: 4 },
+        overflowX: "hidden",
       }}
     >
       {/* Header */}
@@ -239,10 +242,10 @@ export default function AdminDashboard() {
               borderRadius: 4,
               bgcolor: "var(--card)",
               border: "1px solid",
-              borderColor: "#000000",
+              borderColor: "var(--border)",
               height: "100%",
               backgroundImage:
-                "linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0))",
+                "linear-gradient(rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0))",
             }}
           >
             <Stack
@@ -288,7 +291,7 @@ export default function AdminDashboard() {
                 borderRadius: 4,
                 bgcolor: "var(--card)",
                 border: "1px solid",
-                borderColor: "#000000",
+                borderColor: "var(--border)",
               }}
             >
               <Typography
@@ -388,7 +391,7 @@ function AdminStatCard({ title, value, icon, color, trend, highlight }: any) {
         p: 3,
         bgcolor: "var(--card)",
         border: "1px solid",
-        borderColor: highlight ? color : "#000000",
+        borderColor: highlight ? color : "var(--border)",
         borderRadius: 4,
         position: "relative",
         transition: "all 0.3s ease",

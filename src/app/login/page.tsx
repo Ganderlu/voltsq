@@ -5,6 +5,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase/firebaseClient";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { isAdmin } from "../utils/isAdmin";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,8 +21,20 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.push("/dashboard");
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+      const user = userCredential.user;
+
+      // Check if user is admin
+      const adminStatus = await isAdmin(user.uid);
+      if (adminStatus) {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {

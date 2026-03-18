@@ -52,6 +52,7 @@ import {
   updateUserBalance,
   updateUserStatus,
   deleteUser,
+  toggleAdminStatus,
 } from "@/app/actions/admin";
 
 export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
@@ -131,6 +132,22 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
     );
     setUsers((prev) =>
       prev.map((u) => (u.id === uid ? { ...u, status: newStatus } : u)),
+    );
+    setLoading(null);
+  };
+
+  const handleToggleAdmin = async (
+    uid: string,
+    currentAdminStatus: boolean,
+  ) => {
+    const newAdminStatus = !currentAdminStatus;
+    setLoading(uid);
+    await handleAction(
+      () => toggleAdminStatus(uid, newAdminStatus),
+      `User admin status ${newAdminStatus ? "granted" : "revoked"}`,
+    );
+    setUsers((prev) =>
+      prev.map((u) => (u.id === uid ? { ...u, isAdmin: newAdminStatus } : u)),
     );
     setLoading(null);
   };
@@ -454,10 +471,30 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
                       <Box>
                         <Typography
                           variant="body2"
+                          component="div"
                           fontWeight="700"
-                          sx={{ color: "var(--foreground)" }}
+                          sx={{
+                            color: "var(--foreground)",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                          }}
                         >
                           {u.fullName || "Unnamed User"}
+                          {u.isAdmin && (
+                            <Chip
+                              label="ADMIN"
+                              size="small"
+                              sx={{
+                                height: 16,
+                                fontSize: "0.6rem",
+                                fontWeight: 900,
+                                bgcolor: "primary.main",
+                                color: "#fff",
+                                borderRadius: 1,
+                              }}
+                            />
+                          )}
                         </Typography>
                         <Typography
                           variant="caption"
@@ -538,6 +575,18 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
                       >
                         🌍 {u.country || "N/A"}
                       </Typography>
+                      {u.detectedCountry && u.detectedCountry !== "Unknown" && (
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: "var(--primary)",
+                            fontSize: "0.65rem",
+                            fontWeight: 600,
+                          }}
+                        >
+                          Real: {u.detectedCountry}
+                        </Typography>
+                      )}
                       <Typography
                         variant="caption"
                         sx={{
@@ -580,6 +629,35 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
                           }
                         >
                           <Wallet size={16} />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip
+                        title={
+                          u.isAdmin
+                            ? "Revoke Admin Access"
+                            : "Grant Admin Access"
+                        }
+                      >
+                        <IconButton
+                          className="action-btn"
+                          size="small"
+                          disabled={loading === u.id}
+                          sx={{
+                            color: u.isAdmin ? "#ef4444" : "#6366f1",
+                            bgcolor: u.isAdmin
+                              ? "rgba(239, 68, 68, 0.1)"
+                              : "rgba(99, 102, 241, 0.1)",
+                            opacity: 0.6,
+                            transition: "all 0.2s",
+                            "&:hover": {
+                              bgcolor: u.isAdmin ? "#ef4444" : "#6366f1",
+                              color: "#fff",
+                              transform: "scale(1.1)",
+                            },
+                          }}
+                          onClick={() => handleToggleAdmin(u.id, u.isAdmin)}
+                        >
+                          <ShieldCheck size={16} />
                         </IconButton>
                       </Tooltip>
                       <Tooltip

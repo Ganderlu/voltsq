@@ -49,6 +49,7 @@ const menu = [
     icon: Smartphone,
   },
   { label: "Settings", href: "/admin/settings", icon: Settings },
+  { label: "User Dashboard", href: "/dashboard", icon: LayoutDashboard },
 ];
 
 function SidebarItem({ item, pathname, onClose, disabled }: any) {

@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   FileText,
@@ -28,8 +28,11 @@ import {
   Settings,
   ChevronDown,
   ChevronRight,
+  ShieldCheck,
 } from "lucide-react";
 import { ThemeToggle } from "../ThemeToggle";
+import { useAuth } from "@/context/AuthContext";
+import { isAdmin } from "@/app/utils/isAdmin";
 
 interface NavItem {
   label: string;
@@ -257,6 +260,27 @@ export default function Sidebar({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const pathname = usePathname();
+  const { currentUser } = useAuth();
+  const [isAdminUser, setIsAdminUser] = useState(false);
+
+  useEffect(() => {
+    async function checkAdmin() {
+      if (currentUser?.uid) {
+        const admin = await isAdmin(currentUser.uid);
+        setIsAdminUser(admin);
+      }
+    }
+    checkAdmin();
+  }, [currentUser]);
+
+  const items = [...navItems];
+  if (isAdminUser) {
+    items.unshift({
+      label: "Admin Panel",
+      href: "/admin/dashboard",
+      icon: ShieldCheck,
+    });
+  }
 
   const SidebarContent = (
     <Box
@@ -306,7 +330,7 @@ export default function Sidebar({
 
       <Box flex={1} overflow="auto" py={1}>
         <Stack spacing={0.8} px={2}>
-          {navItems.map((item, index) => (
+          {items.map((item, index) => (
             <SidebarItem
               key={index}
               item={item}
