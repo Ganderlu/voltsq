@@ -51,6 +51,8 @@ export default function AdminSettingsPage() {
     severity: "success",
   });
 
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+
   useEffect(() => {
     const ref = doc(db, "system", "settings");
     return onSnapshot(ref, (snap) => {
@@ -314,26 +316,34 @@ export default function AdminSettingsPage() {
                     }}
                   />
                   <Stack direction="row" spacing={2}>
-                    <CldUploadWidget
-                      uploadPreset="voltsq_videos"
-                      onSuccess={(result: any) => {
-                        setSettings((prev) => ({
-                          ...prev,
-                          landingVideoUrl: result.info.secure_url,
-                        }));
-                      }}
-                    >
-                      {({ open }) => (
-                        <Button
-                          variant="outlined"
-                          startIcon={<Upload size={16} />}
-                          onClick={() => open()}
-                          sx={{ borderRadius: 2, textTransform: "none" }}
-                        >
-                          Change Video
-                        </Button>
-                      )}
-                    </CldUploadWidget>
+                    {!cloudName ? (
+                      <Typography variant="caption" color="error">
+                        Cloudinary Cloud Name not set in env vars.
+                      </Typography>
+                    ) : (
+                      <CldUploadWidget
+                        uploadPreset="voltsq_videos"
+                        onSuccess={(result: any) => {
+                          if (result?.info?.secure_url) {
+                            setSettings((prev) => ({
+                              ...prev,
+                              landingVideoUrl: result.info.secure_url,
+                            }));
+                          }
+                        }}
+                      >
+                        {({ open }) => (
+                          <Button
+                            variant="outlined"
+                            startIcon={<Upload size={16} />}
+                            onClick={() => open()}
+                            sx={{ borderRadius: 2, textTransform: "none" }}
+                          >
+                            Change Video
+                          </Button>
+                        )}
+                      </CldUploadWidget>
+                    )}
                     <Button
                       variant="outlined"
                       color="error"
@@ -378,33 +388,41 @@ export default function AdminSettingsPage() {
                       Upload a high-quality video for your landing page
                     </Typography>
                   </Box>
-                  <CldUploadWidget
-                    uploadPreset="voltsq_videos"
-                    onSuccess={(result: any) => {
-                      setSettings((prev) => ({
-                        ...prev,
-                        landingVideoUrl: result.info.secure_url,
-                      }));
-                    }}
-                  >
-                    {({ open }) => (
-                      <Button
-                        variant="contained"
-                        startIcon={<Upload size={16} />}
-                        onClick={() => open()}
-                        sx={{
-                          mt: 1,
-                          borderRadius: 2.5,
-                          px: 4,
-                          py: 1.2,
-                          fontWeight: 700,
-                          textTransform: "none",
-                        }}
-                      >
-                        Upload Video
-                      </Button>
-                    )}
-                  </CldUploadWidget>
+                  {!cloudName ? (
+                    <Typography variant="caption" color="error">
+                      Cloudinary Cloud Name not set in env vars.
+                    </Typography>
+                  ) : (
+                    <CldUploadWidget
+                      uploadPreset="voltsq_videos"
+                      onSuccess={(result: any) => {
+                        if (result?.info?.secure_url) {
+                          setSettings((prev) => ({
+                            ...prev,
+                            landingVideoUrl: result.info.secure_url,
+                          }));
+                        }
+                      }}
+                    >
+                      {({ open }) => (
+                        <Button
+                          variant="contained"
+                          startIcon={<Upload size={16} />}
+                          onClick={() => open()}
+                          sx={{
+                            mt: 1,
+                            borderRadius: 2.5,
+                            px: 4,
+                            py: 1.2,
+                            fontWeight: 700,
+                            textTransform: "none",
+                          }}
+                        >
+                          Upload Video
+                        </Button>
+                      )}
+                    </CldUploadWidget>
+                  )}
                 </Stack>
               )}
             </Box>
