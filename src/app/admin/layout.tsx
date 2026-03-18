@@ -5,50 +5,38 @@ import { Box } from "@mui/material";
 import Sidebar from "../components/admin/Sidebar";
 import Header from "../components/admin/Header";
 import { useAuth } from "@/context/AuthContext";
-import { isAdmin } from "../utils/isAdmin";
 import { usePathname, useRouter } from "next/navigation";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
-  const { currentUser } = useAuth();
-  const [adminAllowed, setAdminAllowed] = useState<boolean | null>(null);
+  const { currentUser, isAdmin, loading } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
-    let cancelled = false;
-    async function check() {
-      if (!currentUser) {
-        setAdminAllowed(false);
-        return;
-      }
-      const ok = await isAdmin(currentUser.uid);
-      if (!cancelled) setAdminAllowed(ok);
-    }
-    check();
-    return () => {
-      cancelled = true;
-    };
-  }, [currentUser]);
-
-  useEffect(() => {
+    if (loading) return;
+    
     const isLogin = pathname === "/login";
-    if (adminAllowed === false && !isLogin) {
+    if (!currentUser || (!isAdmin && !isLogin)) {
       router.replace("/login");
     }
-  }, [adminAllowed, pathname, router]);
+  }, [currentUser, isAdmin, loading, pathname, router]);
 
   const sidebarDisabled = useMemo(() => {
     const isLogin = pathname === "/login";
-    return isLogin || adminAllowed === false || adminAllowed === null;
-  }, [pathname, adminAllowed]);
+    return isLogin || !isAdmin;
+  }, [pathname, isAdmin]);
+
+  if (loading) return null; // Or a loading spinner
 
   return (
-    <Box display="flex" minHeight="100vh" bgcolor="var(--background)">
+    <Box display="flex" height="100vh" bgcolor="var(--background)" sx={{ overflow: "hidden" }}>
       <Sidebar open={open} onClose={() => setOpen(false)} disabled={sidebarDisabled} />
-      <Box flex={1}>
+      <Box flex={1} display="flex" flexDirection="column" sx={{ overflow: "hidden" }}>
         <Header onMenu={() => setOpen(true)} />
-        <Box p={{ xs: 2, md: 3 }}>{children}</Box>
+        <Box flex={1} sx={{ overflowY: "auto", p: { xs: 2, md: 3 } }}>
+          {children}
+        </Box>
       </Box>
     </Box>
   );

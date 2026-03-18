@@ -16,7 +16,8 @@ import {
 import { useEffect, useState } from "react";
 import { db } from "@/app/firebase/firebaseClient";
 import { doc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
-import { Settings, Shield, Save } from "lucide-react";
+import { Settings, Shield, Save, Video, Upload, Trash2 } from "lucide-react";
+import { CldUploadWidget } from "next-cloudinary";
 
 type SystemSettings = {
   maintenance?: boolean;
@@ -26,6 +27,7 @@ type SystemSettings = {
   withdrawalsEnabled?: boolean;
   companyName?: string;
   supportEmail?: string;
+  landingVideoUrl?: string;
 };
 
 export default function AdminSettingsPage() {
@@ -78,9 +80,8 @@ export default function AdminSettingsPage() {
   return (
     <Box
       sx={{
-        p: { xs: 2, md: 4 },
-        bgcolor: "var(--background)",
-        minHeight: "100vh",
+        p: { xs: 0, md: 1 },
+        bgcolor: "transparent",
       }}
     >
       <Stack
@@ -263,7 +264,171 @@ export default function AdminSettingsPage() {
             </Stack>
           </Paper>
         </Grid>
+
+        <Grid size={{ xs: 12 }}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              bgcolor: "var(--card)",
+              border: "1px solid",
+              borderColor: "var(--border)",
+              borderRadius: 4,
+            }}
+          >
+            <Typography
+              variant="subtitle1"
+              fontWeight="800"
+              sx={{
+                color: "var(--foreground)",
+                mb: 3,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <Video size={18} /> Landing Page Video
+            </Typography>
+
+            <Box
+              sx={{
+                p: 3,
+                borderRadius: 3,
+                bgcolor: "var(--background)",
+                border: "2px dashed",
+                borderColor: "var(--border)",
+                textAlign: "center",
+              }}
+            >
+              {settings.landingVideoUrl ? (
+                <Stack spacing={2} alignItems="center">
+                  <Box
+                    component="video"
+                    src={settings.landingVideoUrl}
+                    controls
+                    sx={{
+                      width: "100%",
+                      maxWidth: 400,
+                      borderRadius: 2,
+                      boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
+                    }}
+                  />
+                  <Stack direction="row" spacing={2}>
+                    <CldUploadWidget
+                      uploadPreset="voltsq_videos"
+                      onSuccess={(result: any) => {
+                        setSettings((prev) => ({
+                          ...prev,
+                          landingVideoUrl: result.info.secure_url,
+                        }));
+                      }}
+                    >
+                      {({ open }) => (
+                        <Button
+                          variant="outlined"
+                          startIcon={<Upload size={16} />}
+                          onClick={() => open()}
+                          sx={{ borderRadius: 2, textTransform: "none" }}
+                        >
+                          Change Video
+                        </Button>
+                      )}
+                    </CldUploadWidget>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      startIcon={<Trash2 size={16} />}
+                      onClick={() =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          landingVideoUrl: "",
+                        }))
+                      }
+                      sx={{ borderRadius: 2, textTransform: "none" }}
+                    >
+                      Remove
+                    </Button>
+                  </Stack>
+                </Stack>
+              ) : (
+                <Stack spacing={2} alignItems="center" py={4}>
+                  <Box
+                    sx={{
+                      width: 60,
+                      height: 60,
+                      borderRadius: "50%",
+                      bgcolor: "rgba(37, 99, 235, 0.1)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "primary.main",
+                      mb: 1,
+                    }}
+                  >
+                    <Video size={30} />
+                  </Box>
+                  <Box>
+                    <Typography variant="subtitle1" fontWeight={700}>
+                      No Landing Video Set
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "var(--muted-foreground)" }}
+                    >
+                      Upload a high-quality video for your landing page
+                    </Typography>
+                  </Box>
+                  <CldUploadWidget
+                    uploadPreset="voltsq_videos"
+                    onSuccess={(result: any) => {
+                      setSettings((prev) => ({
+                        ...prev,
+                        landingVideoUrl: result.info.secure_url,
+                      }));
+                    }}
+                  >
+                    {({ open }) => (
+                      <Button
+                        variant="contained"
+                        startIcon={<Upload size={16} />}
+                        onClick={() => open()}
+                        sx={{
+                          mt: 1,
+                          borderRadius: 2.5,
+                          px: 4,
+                          py: 1.2,
+                          fontWeight: 700,
+                          textTransform: "none",
+                        }}
+                      >
+                        Upload Video
+                      </Button>
+                    )}
+                  </CldUploadWidget>
+                </Stack>
+              )}
+            </Box>
+          </Paper>
+        </Grid>
       </Grid>
+
+      <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
+        <Button
+          variant="contained"
+          onClick={save}
+          disabled={saving}
+          startIcon={<Save size={16} />}
+          sx={{
+            borderRadius: 2.5,
+            fontWeight: 800,
+            px: 4,
+            py: 1.5,
+            boxShadow: "0 4px 20px rgba(37, 99, 235, 0.3)",
+          }}
+        >
+          {saving ? "Saving..." : "Save Changes"}
+        </Button>
+      </Box>
 
       <Snackbar
         open={snackbar.open}

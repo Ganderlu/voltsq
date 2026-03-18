@@ -89,9 +89,8 @@ export default function AdminDepositsPage() {
   return (
     <Box
       sx={{
-        p: { xs: 2, md: 4 },
-        bgcolor: "var(--background)",
-        minHeight: "100vh",
+        p: { xs: 0, md: 1 },
+        bgcolor: "transparent",
       }}
     >
       {/* Header */}

@@ -12,23 +12,32 @@ import { auth } from "../app/firebase/firebaseClient";
 
 type AuthContextType = {
   currentUser: User | null;
+  isAdmin: boolean;
   loading: boolean;
   logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
   currentUser: null,
+  isAdmin: false,
   loading: true,
   logout: async () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
+    const unsub = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
+      if (user) {
+        const token = await user.getIdTokenResult();
+        setIsAdmin(!!token.claims.admin);
+      } else {
+        setIsAdmin(false);
+      }
       setLoading(false);
     });
 
@@ -38,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => signOut(auth);
 
   return (
-    <AuthContext.Provider value={{ currentUser, loading, logout }}>
+    <AuthContext.Provider value={{ currentUser, isAdmin, loading, logout }}>
       {!loading && children}
     </AuthContext.Provider>
   );

@@ -126,7 +126,12 @@ export default function AdminTradingPage() {
   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 }, bgcolor: "var(--background)", minHeight: "100vh" }}>
+    <Box
+      sx={{
+        p: { xs: 0, md: 1 },
+        bgcolor: "transparent",
+      }}
+    >
       <Stack direction={isMobile ? "column" : "row"} spacing={2} justifyContent="space-between" alignItems={isMobile ? "flex-start" : "center"} sx={{ mb: 4 }}>
         <Box>
           <Typography variant="h4" fontWeight="800" sx={{ color: "var(--foreground)", mb: 0.5, display: "flex", alignItems: "center", gap: 1.5 }}>

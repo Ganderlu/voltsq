@@ -1,6 +1,6 @@
 "use server";
 
-import { adminDb } from "../firebase/firebaseAdmin";
+import { adminAuth, adminDb } from "../firebase/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 
 export async function updateUserBalance(uid: string, amount: number) {
@@ -199,17 +199,15 @@ export async function settleInvestment(investmentId: string) {
 }
 
 export async function toggleAdminStatus(uid: string, isAdmin: boolean) {
-  if (!adminDb) throw new Error("Admin DB not initialized");
+  if (!adminDb || !adminAuth) throw new Error("Admin DB not initialized");
 
-  const adminRef = adminDb.doc(`admins/${uid}`);
-  if (isAdmin) {
-    await adminRef.set({
-      uid,
-      createdAt: new Date(),
-    });
-  } else {
-    await adminRef.delete();
-  }
+  // Set custom claim on the user's auth token
+  await adminAuth.setCustomUserClaims(uid, { admin: isAdmin });
+
+  // For immediate reflection, you might still keep a flag in the DB
+  await adminDb
+    .doc(`users/${uid}`)
+    .update({ role: isAdmin ? "admin" : "user" });
 
   return { success: true };
 }

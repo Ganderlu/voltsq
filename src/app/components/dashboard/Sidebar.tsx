@@ -32,7 +32,6 @@ import {
 } from "lucide-react";
 import { ThemeToggle } from "../ThemeToggle";
 import { useAuth } from "@/context/AuthContext";
-import { isAdmin } from "@/app/utils/isAdmin";
 
 interface NavItem {
   label: string;
@@ -260,21 +259,10 @@ export default function Sidebar({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const pathname = usePathname();
-  const { currentUser } = useAuth();
-  const [isAdminUser, setIsAdminUser] = useState(false);
-
-  useEffect(() => {
-    async function checkAdmin() {
-      if (currentUser?.uid) {
-        const admin = await isAdmin(currentUser.uid);
-        setIsAdminUser(admin);
-      }
-    }
-    checkAdmin();
-  }, [currentUser]);
+  const { isAdmin } = useAuth();
 
   const items = [...navItems];
-  if (isAdminUser) {
+  if (isAdmin) {
     items.unshift({
       label: "Admin Panel",
       href: "/admin/dashboard",

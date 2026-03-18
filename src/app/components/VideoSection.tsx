@@ -1,10 +1,32 @@
 "use client";
 
 import { Box, Container, Typography } from "@mui/material";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/app/firebase/firebaseClient";
 
 export default function VideoSection() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoUrl, setVideoUrl] = useState("/videos/Voltsq.mp4");
+
+  useEffect(() => {
+    // Use getDoc instead of onSnapshot to avoid permission errors if rules are strict
+    // Ideally, "system/settings" should be readable by public in security rules
+    const fetchVideo = async () => {
+      try {
+        const snap = await getDoc(doc(db, "system", "settings"));
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data.landingVideoUrl) {
+            setVideoUrl(data.landingVideoUrl);
+          }
+        }
+      } catch (error) {
+        console.warn("Could not fetch custom video, using default.", error);
+      }
+    };
+    fetchVideo();
+  }, []);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -26,7 +48,7 @@ export default function VideoSection() {
 
       playVideo();
     }
-  }, []);
+  }, [videoUrl]); // Re-play when URL changes
 
   return (
     <Box sx={{ bgcolor: "var(--background)", py: { xs: 6, md: 10 } }}>
@@ -71,6 +93,7 @@ export default function VideoSection() {
           }}
         >
           <video
+            key={videoUrl}
             ref={videoRef}
             autoPlay
             loop
@@ -84,7 +107,7 @@ export default function VideoSection() {
               objectFit: "cover",
             }}
           >
-            <source src="/videos/Voltsq.mp4" type="video/mp4" />
+            <source src={videoUrl} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         </Box>

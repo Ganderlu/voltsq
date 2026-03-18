@@ -173,9 +173,8 @@ export default function AdminStatisticsPage() {
   return (
     <Box
       sx={{
-        minHeight: "100vh",
-        bgcolor: "var(--background)",
-        p: { xs: 2, md: 4 },
+        p: { xs: 0, md: 1 },
+        bgcolor: "transparent",
       }}
     >
       <Stack

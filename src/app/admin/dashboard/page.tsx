@@ -142,10 +142,9 @@ export default function AdminDashboard() {
     <Box
       component="main"
       sx={{
-        minHeight: "100vh",
-        bgcolor: "var(--background)",
+        p: { xs: 0, md: 1 },
+        bgcolor: "transparent",
         color: "var(--foreground)",
-        p: { xs: 2, md: 4 },
         overflowX: "hidden",
       }}
     >
