@@ -8,7 +8,8 @@ import {
   ReactNode,
 } from "react";
 import { onAuthStateChanged, User, signOut } from "firebase/auth";
-import { auth } from "../app/firebase/firebaseClient";
+import { auth, db } from "../app/firebase/firebaseClient";
+import { doc, getDoc } from "firebase/firestore";
 
 type AuthContextType = {
   currentUser: User | null;
@@ -33,8 +34,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsub = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
       if (user) {
+        // 1. Check custom claims (primary & secure)
         const token = await user.getIdTokenResult();
-        setIsAdmin(!!token.claims.admin);
+        let adminStatus = !!token.claims.admin;
+
+        // 2. Fallback check for transition (if claim not yet set)
+        if (!adminStatus) {
+          try {
+            const adminDoc = await getDoc(doc(db, "admins", user.uid));
+            if (adminDoc.exists()) {
+              adminStatus = true;
+            }
+          } catch (e) {
+            console.warn("AuthContext: Admin collection fallback check failed", e);
+          }
+        }
+
+        setIsAdmin(adminStatus);
       } else {
         setIsAdmin(false);
       }
