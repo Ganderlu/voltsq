@@ -7,11 +7,15 @@ import {
   Grid,
   Card,
   CardContent,
+  Button,
+  Stack,
 } from "@mui/material";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { ShieldCheck, FileCheck, Globe, Building2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import Link from "next/link";
+import { Download } from "lucide-react";
 
 export default function LicensePage() {
   const { t } = useLanguage();
@@ -205,6 +209,90 @@ export default function LicensePage() {
             </Box>
           </Grid>
         </Grid>
+
+        <Box sx={{ mt: 8 }}>
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: 800, color: "var(--foreground)", mb: 2 }}
+          >
+            Download Company Documents
+          </Typography>
+          <Typography sx={{ color: "var(--muted-foreground)", mb: 4, maxWidth: 900 }}>
+            Download professional documents (PDF via print) covering company licensing, compliance, risk disclosure, and privacy/security requirements.
+          </Typography>
+
+          <Grid container spacing={3}>
+            {[
+              {
+                title: "Company Licence",
+                desc: "Registration details, operational scope, compliance obligations, and verification.",
+                href: "/license/documents/company-license",
+              },
+              {
+                title: "AML / KYC Policy",
+                desc: "CDD/EDD, sanctions screening, monitoring, escalation, recordkeeping, and governance.",
+                href: "/license/documents/aml-kyc-policy",
+              },
+              {
+                title: "Risk Disclosure",
+                desc: "Market, leverage, liquidity, custody, and technology risks with acceptance statement.",
+                href: "/license/documents/risk-disclosure",
+              },
+              {
+                title: "Privacy & Security Policy",
+                desc: "Data collection, usage, sharing, retention, security controls, and user rights.",
+                href: "/license/documents/privacy-security-policy",
+              },
+            ].map((doc) => (
+              <Grid key={doc.href} size={{ xs: 12, md: 6 }}>
+                <Card
+                  sx={{
+                    bgcolor: "var(--card)",
+                    border: "1px solid var(--border)",
+                    height: "100%",
+                  }}
+                >
+                  <CardContent sx={{ p: 4 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 800, color: "var(--foreground)" }}>
+                      {doc.title}
+                    </Typography>
+                    <Typography sx={{ mt: 1, color: "var(--muted-foreground)", lineHeight: 1.7 }}>
+                      {doc.desc}
+                    </Typography>
+
+                    <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 3 }}>
+                      <Button
+                        component={Link}
+                        href={doc.href}
+                        variant="contained"
+                        startIcon={<Download size={18} />}
+                        sx={{
+                          bgcolor: "var(--primary)",
+                          color: "var(--primary-foreground)",
+                          "&:hover": { bgcolor: "var(--primary)", opacity: 0.9 },
+                        }}
+                      >
+                        Open & Download
+                      </Button>
+                      <Button
+                        component={Link}
+                        href={doc.href}
+                        variant="outlined"
+                        sx={{
+                          borderColor: "var(--border)",
+                          color: "var(--foreground)",
+                          "&:hover": { borderColor: "var(--primary)" },
+                        }}
+                      >
+                        Preview
+                      </Button>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
       </Container>
 
       <Footer />
