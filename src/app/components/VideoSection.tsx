@@ -1,54 +1,10 @@
 "use client";
 
 import { Box, Container, Typography } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/app/firebase/firebaseClient";
 
 export default function VideoSection() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoUrl, setVideoUrl] = useState("/videos/Voltsq.mp4");
-
-  useEffect(() => {
-    // Use getDoc instead of onSnapshot to avoid permission errors if rules are strict
-    // Ideally, "system/settings" should be readable by public in security rules
-    const fetchVideo = async () => {
-      try {
-        const snap = await getDoc(doc(db, "system", "settings"));
-        if (snap.exists()) {
-          const data = snap.data();
-          if (data.landingVideoUrl) {
-            setVideoUrl(data.landingVideoUrl);
-          }
-        }
-      } catch (error) {
-        console.warn("Could not fetch custom video, using default.", error);
-      }
-    };
-    fetchVideo();
-  }, []);
-
-  useEffect(() => {
-    if (videoRef.current) {
-      // Ensure video is muted to allow autoplay on most browsers
-      videoRef.current.muted = true;
-      videoRef.current.defaultMuted = true;
-
-      const playVideo = async () => {
-        try {
-          await videoRef.current?.play();
-        } catch (error) {
-          console.warn(
-            "Initial video play failed, retrying after interaction:",
-            error,
-          );
-          // Some browsers block autoplay even if muted until first interaction
-        }
-      };
-
-      playVideo();
-    }
-  }, [videoUrl]); // Re-play when URL changes
+  const cloudinaryEmbedUrl =
+    "https://player.cloudinary.com/embed/?cloud_name=ddhhtyev6&public_id=rm5ih70sr1tfe6syo3kr&autoplay=true&muted=true&loop=true";
 
   return (
     <Box sx={{ bgcolor: "var(--background)", py: { xs: 6, md: 10 } }}>
@@ -92,24 +48,17 @@ export default function VideoSection() {
             bgcolor: "black",
           }}
         >
-          <video
-            key={videoUrl}
-            ref={videoRef}
-            autoPlay
-            loop
-            muted
-            playsInline
-            controls
-            preload="auto"
+          <iframe
+            src={cloudinaryEmbedUrl}
+            allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+            allowFullScreen
             style={{
               width: "100%",
               height: "100%",
-              objectFit: "cover",
+              border: 0,
             }}
-          >
-            <source src={videoUrl} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
+            title="Voltsq Video"
+          />
         </Box>
       </Container>
     </Box>
