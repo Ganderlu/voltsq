@@ -4,7 +4,6 @@ import {
   collection,
   doc,
   onSnapshot,
-  runTransaction,
   updateDoc,
 } from "firebase/firestore";
 import { db } from "@/app/firebase/firebaseClient";
@@ -41,6 +40,7 @@ import {
   AlertCircle,
   Calendar,
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function AdminWithdrawals() {
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
@@ -48,6 +48,7 @@ export default function AdminWithdrawals() {
   const [search, setSearch] = useState("");
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     return onSnapshot(collection(db, "withdrawals"), (snap) => {
@@ -66,36 +67,28 @@ export default function AdminWithdrawals() {
   const approveWithdraw = async (w: any) => {
     try {
       setLoadingAction(w.id);
-      const userRef = doc(db, "users", w.userId);
-      const withdrawalRef = doc(db, "withdrawals", w.id);
+      if (!currentUser) throw new Error("Not signed in");
+      const token = await currentUser.getIdToken(true);
 
-      await runTransaction(db, async (tx) => {
-        const userSnap = await tx.get(userRef);
-        if (!userSnap.exists()) throw new Error("User not found");
-
-        const balance = userSnap.data().usdtBalance || 0;
-
-        if (balance < w.amount) {
-          throw new Error("Insufficient balance");
-        }
-
-        tx.update(userRef, {
-          usdtBalance: balance - w.amount,
-        });
-
-        tx.update(withdrawalRef, {
-          status: "approved",
-          processedAt: new Date(),
-        });
-
-        tx.set(doc(collection(db, "notifications")), {
-          userId: w.userId,
-          title: "Withdrawal Approved",
-          message: `Your $${w.amount} withdrawal was approved.`,
-          read: false,
-          createdAt: new Date(),
-        });
+      const res = await fetch("/api/admin/withdrawals/approve", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ withdrawalId: w.id }),
       });
+
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(json?.error || "Failed to approve withdrawal");
+      }
+
+      if (json?.emailSent === false) {
+        alert(
+          "Withdrawal approved, but the approval email could not be sent. Please check RESEND_API_KEY and try again.",
+        );
+      }
     } catch (err: any) {
       alert(err.message || "Failed to approve withdrawal");
     } finally {
@@ -193,10 +186,12 @@ export default function AdminWithdrawals() {
           border: "1px solid",
           borderColor: "var(--border)",
           borderRadius: 4,
-          overflow: "hidden",
+          overflowX: "auto",
+          overflowY: "hidden",
         }}
       >
-        <Table>
+        <Box sx={{ minWidth: 720 }}>
+          <Table>
           <TableHead sx={{ bgcolor: "rgba(255,255,255,0.02)" }}>
             <TableRow>
               <TableCell
@@ -388,7 +383,8 @@ export default function AdminWithdrawals() {
               ))
             )}
           </TableBody>
-        </Table>
+          </Table>
+        </Box>
       </Paper>
     </Box>
   );

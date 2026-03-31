@@ -1,12 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/app/components/ThemeProvider";
 import { LanguageProvider } from "@/context/LanguageContext";
-
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "Voltsq  Invest | Premium Digital Asset Trading",
@@ -31,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body
-        className={`${inter.variable} font-sans antialiased bg-background text-foreground`}
+        className="font-sans antialiased bg-background text-foreground"
       >
         <ThemeProvider
           attribute="class"

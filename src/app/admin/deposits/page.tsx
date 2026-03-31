@@ -158,10 +158,12 @@ export default function AdminDepositsPage() {
           border: "1px solid",
           borderColor: "var(--border)",
           borderRadius: 4,
-          overflow: "hidden",
+          overflowX: "auto",
+          overflowY: "hidden",
         }}
       >
-        <Table>
+        <Box sx={{ minWidth: 900 }}>
+          <Table>
           <TableHead sx={{ bgcolor: "rgba(255,255,255,0.02)" }}>
             <TableRow>
               <TableCell
@@ -410,7 +412,8 @@ export default function AdminDepositsPage() {
               ))
             )}
           </TableBody>
-        </Table>
+          </Table>
+        </Box>
       </Paper>
     </Box>
   );

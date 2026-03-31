@@ -77,3 +77,113 @@ export async function sendWelcomeEmail(email: string, fullName: string) {
     return { success: false, error: err };
   }
 }
+
+function maskAddress(address: string) {
+  const trimmed = address.trim();
+  if (trimmed.length <= 12) return trimmed;
+  return `${trimmed.slice(0, 6)}...${trimmed.slice(-4)}`;
+}
+
+export async function sendWithdrawalApprovedEmail(params: {
+  toEmail: string;
+  fullName?: string;
+  withdrawalId: string;
+  amount: number;
+  asset?: string;
+  receiveAmount?: number;
+  address?: string;
+  processedAtISO?: string;
+}) {
+  try {
+    const resendClient = getResend();
+
+    if (!resendClient) {
+      console.warn("⚠️ [Email] Resend API key missing. Skipping email.");
+      return { success: false, error: "API key missing" };
+    }
+
+    const displayName = params.fullName?.trim() || "Investor";
+    const asset = params.asset || "USDT";
+    const processedAt = params.processedAtISO
+      ? new Date(params.processedAtISO)
+      : new Date();
+    const processedAtText = processedAt.toLocaleString();
+    const addressText = params.address ? maskAddress(params.address) : "N/A";
+    const receiveText =
+      typeof params.receiveAmount === "number" && Number.isFinite(params.receiveAmount)
+        ? `$${params.receiveAmount.toFixed(2)}`
+        : "—";
+
+    const amountText = `$${Number(params.amount).toFixed(2)}`;
+
+    const { data, error } = await resendClient.emails.send({
+      from: "Voltsq Investments <onboarding@resend.dev>",
+      to: [params.toEmail],
+      subject: "Your withdrawal has been approved",
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Withdrawal Approved</title>
+            <style>
+              body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #0f172a; margin: 0; padding: 0; background-color: #f4f7f9; }
+              .container { max-width: 640px; margin: 20px auto; background: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+              .header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 34px 22px; text-align: center; color: #ffffff; }
+              .brand { margin: 0; font-size: 22px; font-weight: 900; letter-spacing: -0.3px; }
+              .subtitle { margin: 8px 0 0; font-size: 13px; opacity: 0.9; }
+              .content { padding: 30px 24px; }
+              .title { margin: 0 0 10px; font-size: 22px; font-weight: 900; }
+              .text { margin: 0 0 16px; color: #334155; }
+              .card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; background: #f8fafc; }
+              .row { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #e2e8f0; }
+              .row:last-child { border-bottom: none; }
+              .k { width: 42%; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
+              .v { width: 58%; font-weight: 700; color: #0f172a; }
+              .badge { display: inline-block; margin-top: 14px; padding: 8px 12px; border-radius: 999px; background: rgba(59, 130, 246, 0.12); color: #1d4ed8; font-weight: 800; font-size: 12px; }
+              .footer { background: #f8fafc; padding: 18px 22px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; }
+              .muted { color: #64748b; font-size: 12px; margin: 16px 0 0; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <div class="brand">Voltsq Investments</div>
+                <div class="subtitle">Withdrawal Status Update</div>
+              </div>
+              <div class="content">
+                <div class="title">Withdrawal Approved</div>
+                <p class="text">Hello ${displayName}, your withdrawal request has been approved and is now being processed.</p>
+                <div class="card">
+                  <div class="row"><div class="k">Amount</div><div class="v">${amountText}</div></div>
+                  <div class="row"><div class="k">Asset</div><div class="v">${asset}</div></div>
+                  <div class="row"><div class="k">You will receive</div><div class="v">${receiveText}</div></div>
+                  <div class="row"><div class="k">Destination</div><div class="v">${addressText}</div></div>
+                  <div class="row"><div class="k">Reference</div><div class="v">${params.withdrawalId}</div></div>
+                  <div class="row"><div class="k">Approved at</div><div class="v">${processedAtText}</div></div>
+                </div>
+                <div class="badge">Approved</div>
+                <p class="muted">If you did not request this withdrawal or you notice anything unusual, contact support@voltsq.com immediately.</p>
+              </div>
+              <div class="footer">
+                <div>&copy; 2026 Voltsq Investments. All rights reserved.</div>
+                <div>This is an automated message. Please do not reply directly to this email.</div>
+              </div>
+            </div>
+          </body>
+        </html>
+      `,
+    });
+
+    if (error) {
+      console.error("Resend Error:", error);
+      return { success: false, error };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    console.error("Email Send Error:", err);
+    return { success: false, error: err };
+  }
+}
