@@ -25,8 +25,6 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "../../firebase/firebaseClient";
 import { useAuth } from "@/context/AuthContext";
 
 export default function WithdrawModal({
@@ -72,17 +70,25 @@ export default function WithdrawModal({
 
     setLoading(true);
     try {
-      await addDoc(collection(db, "withdrawals"), {
-        userId: currentUser.uid,
-        userEmail: currentUser.email,
-        asset: asset,
-        amount: numericAmount,
-        fee: fee,
-        receiveAmount: receiveAmount,
-        address: address,
-        status: "pending",
-        createdAt: serverTimestamp(),
+      const token = await currentUser.getIdToken(true);
+      const res = await fetch("/api/withdrawals/request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          asset,
+          amount: numericAmount,
+          fee,
+          receiveAmount,
+          address,
+        }),
       });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(json?.error || "Failed to submit withdrawal");
+      }
 
       setSuccess(true);
       setTimeout(() => {

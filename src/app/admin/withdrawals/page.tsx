@@ -5,9 +5,10 @@ import {
   doc,
   onSnapshot,
   updateDoc,
+  getDoc,
 } from "firebase/firestore";
 import { db } from "@/app/firebase/firebaseClient";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Table,
@@ -49,6 +50,9 @@ export default function AdminWithdrawals() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const { currentUser } = useAuth();
+  const [userInfoById, setUserInfoById] = useState<
+    Record<string, { fullName: string; email: string }>
+  >({});
 
   useEffect(() => {
     return onSnapshot(collection(db, "withdrawals"), (snap) => {
@@ -63,6 +67,49 @@ export default function AdminWithdrawals() {
       );
     });
   }, []);
+
+  useEffect(() => {
+    const userIds = Array.from(
+      new Set(
+        withdrawals
+          .map((w) => w.userId)
+          .filter((id: any) => typeof id === "string" && id.length > 0),
+      ),
+    ) as string[];
+
+    const missing = userIds.filter((id) => !userInfoById[id]);
+    if (missing.length === 0) return;
+
+    let cancelled = false;
+    (async () => {
+      const entries = await Promise.all(
+        missing.map(async (uid) => {
+          try {
+            const snap = await getDoc(doc(db, "users", uid));
+            const data = snap.exists() ? (snap.data() as any) : null;
+            const fullName =
+              (data?.fullName || data?.username || "").toString().trim() ||
+              "Investor";
+            const email = (data?.email || "").toString().trim();
+            return [uid, { fullName, email }] as const;
+          } catch {
+            return [uid, { fullName: "Investor", email: "" }] as const;
+          }
+        }),
+      );
+
+      if (cancelled) return;
+      setUserInfoById((prev) => {
+        const next = { ...prev };
+        for (const [uid, info] of entries) next[uid] = info;
+        return next;
+      });
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [withdrawals, userInfoById]);
 
   const approveWithdraw = async (w: any) => {
     try {
@@ -110,9 +157,16 @@ export default function AdminWithdrawals() {
     }
   };
 
-  const filteredWithdrawals = withdrawals.filter((w) =>
-    `${w.userId} ${w.id}`.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filteredWithdrawals = useMemo(() => {
+    const q = search.toLowerCase();
+    if (!q) return withdrawals;
+    return withdrawals.filter((w) => {
+      const u = userInfoById[w.userId] || { fullName: "", email: "" };
+      return `${w.userId} ${w.id} ${w.userEmail || ""} ${u.email} ${u.fullName}`
+        .toLowerCase()
+        .includes(q);
+    });
+  }, [withdrawals, search, userInfoById]);
 
   return (
     <Box
@@ -192,197 +246,205 @@ export default function AdminWithdrawals() {
       >
         <Box sx={{ minWidth: 720 }}>
           <Table>
-          <TableHead sx={{ bgcolor: "rgba(255,255,255,0.02)" }}>
-            <TableRow>
-              <TableCell
-                sx={{ color: "var(--muted-foreground)", fontWeight: 600 }}
-              >
-                Investor ID
-              </TableCell>
-              <TableCell
-                sx={{ color: "var(--muted-foreground)", fontWeight: 600 }}
-              >
-                Amount
-              </TableCell>
-              <TableCell
-                sx={{ color: "var(--muted-foreground)", fontWeight: 600 }}
-              >
-                Date Requested
-              </TableCell>
-              <TableCell
-                sx={{ color: "var(--muted-foreground)", fontWeight: 600 }}
-              >
-                Status
-              </TableCell>
-              <TableCell
-                align="right"
-                sx={{ color: "var(--muted-foreground)", fontWeight: 600 }}
-              >
-                Action
-              </TableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {filteredWithdrawals.length === 0 ? (
+            <TableHead sx={{ bgcolor: "rgba(255,255,255,0.02)" }}>
               <TableRow>
-                <TableCell colSpan={5} align="center" sx={{ py: 10 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "var(--muted-foreground)" }}
-                  >
-                    No withdrawal requests found.
-                  </Typography>
+                <TableCell
+                  sx={{ color: "var(--muted-foreground)", fontWeight: 600 }}
+                >
+                  Investor
+                </TableCell>
+                <TableCell
+                  sx={{ color: "var(--muted-foreground)", fontWeight: 600 }}
+                >
+                  Amount
+                </TableCell>
+                <TableCell
+                  sx={{ color: "var(--muted-foreground)", fontWeight: 600 }}
+                >
+                  Date Requested
+                </TableCell>
+                <TableCell
+                  sx={{ color: "var(--muted-foreground)", fontWeight: 600 }}
+                >
+                  Status
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{ color: "var(--muted-foreground)", fontWeight: 600 }}
+                >
+                  Action
                 </TableCell>
               </TableRow>
-            ) : (
-              filteredWithdrawals.map((w) => (
-                <TableRow
-                  key={w.id}
-                  sx={{ "&:hover": { bgcolor: "rgba(255,255,255,0.01)" } }}
-                >
-                  <TableCell>
-                    <Stack direction="row" spacing={1.5} alignItems="center">
-                      <Avatar
-                        sx={{
-                          width: 32,
-                          height: 32,
-                          bgcolor: "rgba(239, 68, 68, 0.1)",
-                          color: "#ef4444",
-                        }}
-                      >
-                        <User size={16} />
-                      </Avatar>
-                      <Box>
-                        <Typography
-                          variant="body2"
-                          fontWeight="700"
-                          sx={{ color: "var(--foreground)" }}
+            </TableHead>
+
+            <TableBody>
+              {filteredWithdrawals.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} align="center" sx={{ py: 10 }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "var(--muted-foreground)" }}
+                    >
+                      No withdrawal requests found.
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredWithdrawals.map((w) => (
+                  <TableRow
+                    key={w.id}
+                    sx={{ "&:hover": { bgcolor: "rgba(255,255,255,0.01)" } }}
+                  >
+                    <TableCell>
+                      <Stack direction="row" spacing={1.5} alignItems="center">
+                        <Avatar
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            bgcolor: "rgba(239, 68, 68, 0.1)",
+                            color: "#ef4444",
+                          }}
                         >
-                          {w.userId?.slice(0, 12)}...
-                        </Typography>
+                          <User size={16} />
+                        </Avatar>
+                        <Box>
+                          <Typography
+                            variant="body2"
+                            fontWeight="700"
+                            sx={{ color: "var(--foreground)" }}
+                          >
+                            {(
+                              userInfoById[w.userId]?.fullName ||
+                              w.userEmail?.split("@")?.[0] ||
+                              "Investor"
+                            )
+                              .toString()
+                              .toUpperCase()}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: "var(--muted-foreground)" }}
+                          >
+                            {w.userEmail ||
+                              userInfoById[w.userId]?.email ||
+                              "—"}
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        variant="body2"
+                        fontWeight="800"
+                        sx={{ color: "#ef4444" }}
+                      >
+                        -$
+                        {Number(w.amount).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                        })}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Calendar size={14} color="var(--muted-foreground)" />
                         <Typography
                           variant="caption"
                           sx={{ color: "var(--muted-foreground)" }}
                         >
-                          ID: {w.id?.slice(0, 8)}
+                          {w.createdAt?.toDate?.().toLocaleString() || "N/A"}
                         </Typography>
-                      </Box>
-                    </Stack>
-                  </TableCell>
-                  <TableCell>
-                    <Typography
-                      variant="body2"
-                      fontWeight="800"
-                      sx={{ color: "#ef4444" }}
-                    >
-                      -$
-                      {Number(w.amount).toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                      })}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Calendar size={14} color="var(--muted-foreground)" />
-                      <Typography
-                        variant="caption"
-                        sx={{ color: "var(--muted-foreground)" }}
-                      >
-                        {w.createdAt?.toDate?.().toLocaleString() || "N/A"}
-                      </Typography>
-                    </Stack>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={w.status}
-                      size="small"
-                      icon={
-                        w.status === "approved" ? (
-                          <CheckCircle2 size={12} />
-                        ) : w.status === "rejected" ? (
-                          <XCircle size={12} />
-                        ) : (
-                          <Clock size={12} />
-                        )
-                      }
-                      sx={{
-                        bgcolor:
-                          w.status === "approved"
-                            ? "rgba(34, 197, 94, 0.1)"
-                            : w.status === "rejected"
-                              ? "rgba(239, 68, 68, 0.1)"
-                              : "rgba(234, 179, 8, 0.1)",
-                        color:
-                          w.status === "approved"
-                            ? "#22c55e"
-                            : w.status === "rejected"
-                              ? "#ef4444"
-                              : "#eab308",
-                        fontWeight: 800,
-                        fontSize: "0.65rem",
-                        textTransform: "uppercase",
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell align="right">
-                    {w.status === "pending" ? (
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        justifyContent="flex-end"
-                      >
-                        <Button
-                          size="small"
-                          variant="contained"
-                          disabled={loadingAction === w.id}
-                          onClick={() => approveWithdraw(w)}
-                          sx={{
-                            bgcolor: "#22c55e",
-                            "&:hover": { bgcolor: "#16a34a" },
-                            borderRadius: 2,
-                            textTransform: "none",
-                            fontWeight: 700,
-                          }}
-                        >
-                          {loadingAction === w.id ? (
-                            <CircularProgress size={16} color="inherit" />
-                          ) : (
-                            "Approve"
-                          )}
-                        </Button>
-                        <Button
-                          size="small"
-                          color="error"
-                          variant="outlined"
-                          disabled={loadingAction === w.id}
-                          onClick={() => rejectWithdraw(w.id)}
-                          sx={{
-                            borderRadius: 2,
-                            textTransform: "none",
-                            fontWeight: 700,
-                          }}
-                        >
-                          {loadingAction === w.id ? (
-                            <CircularProgress size={16} color="inherit" />
-                          ) : (
-                            "Reject"
-                          )}
-                        </Button>
                       </Stack>
-                    ) : (
-                      <Typography
-                        variant="caption"
-                        sx={{ color: "var(--muted-foreground)" }}
-                      >
-                        Processed
-                      </Typography>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={w.status}
+                        size="small"
+                        icon={
+                          w.status === "approved" ? (
+                            <CheckCircle2 size={12} />
+                          ) : w.status === "rejected" ? (
+                            <XCircle size={12} />
+                          ) : (
+                            <Clock size={12} />
+                          )
+                        }
+                        sx={{
+                          bgcolor:
+                            w.status === "approved"
+                              ? "rgba(34, 197, 94, 0.1)"
+                              : w.status === "rejected"
+                                ? "rgba(239, 68, 68, 0.1)"
+                                : "rgba(234, 179, 8, 0.1)",
+                          color:
+                            w.status === "approved"
+                              ? "#22c55e"
+                              : w.status === "rejected"
+                                ? "#ef4444"
+                                : "#eab308",
+                          fontWeight: 800,
+                          fontSize: "0.65rem",
+                          textTransform: "uppercase",
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell align="right">
+                      {w.status === "pending" ? (
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          justifyContent="flex-end"
+                        >
+                          <Button
+                            size="small"
+                            variant="contained"
+                            disabled={loadingAction === w.id}
+                            onClick={() => approveWithdraw(w)}
+                            sx={{
+                              bgcolor: "#22c55e",
+                              "&:hover": { bgcolor: "#16a34a" },
+                              borderRadius: 2,
+                              textTransform: "none",
+                              fontWeight: 700,
+                            }}
+                          >
+                            {loadingAction === w.id ? (
+                              <CircularProgress size={16} color="inherit" />
+                            ) : (
+                              "Approve"
+                            )}
+                          </Button>
+                          <Button
+                            size="small"
+                            color="error"
+                            variant="outlined"
+                            disabled={loadingAction === w.id}
+                            onClick={() => rejectWithdraw(w.id)}
+                            sx={{
+                              borderRadius: 2,
+                              textTransform: "none",
+                              fontWeight: 700,
+                            }}
+                          >
+                            {loadingAction === w.id ? (
+                              <CircularProgress size={16} color="inherit" />
+                            ) : (
+                              "Reject"
+                            )}
+                          </Button>
+                        </Stack>
+                      ) : (
+                        <Typography
+                          variant="caption"
+                          sx={{ color: "var(--muted-foreground)" }}
+                        >
+                          Processed
+                        </Typography>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
           </Table>
         </Box>
       </Paper>

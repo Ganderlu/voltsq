@@ -2,6 +2,7 @@
 
 import { adminAuth, adminDb } from "../firebase/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
+import { sendDepositApprovedEmail } from "../utils/email";
 
 export async function updateUserBalance(uid: string, amount: number) {
   if (!adminDb) throw new Error("Admin DB not initialized");
@@ -39,8 +40,16 @@ export async function approveDeposit(deposit: any) {
 
   const { id: depositId, userId, amount } = deposit;
 
+  const depositRef = adminDb.doc(`deposits/${depositId}`);
+  const depositSnap = await depositRef.get();
+  if (!depositSnap.exists) throw new Error("Deposit not found");
+  const depositData = depositSnap.data() as any;
+  if (depositData?.status === "approved") {
+    return { success: true, alreadyApproved: true };
+  }
+
   // 1️⃣ Update deposit status
-  await adminDb.doc(`deposits/${depositId}`).update({
+  await depositRef.update({
     status: "approved",
     approvedAt: new Date(),
   });
@@ -87,6 +96,41 @@ export async function approveDeposit(deposit: any) {
     read: false,
     createdAt: new Date(),
   });
+
+  if (!depositData?.approvedEmailSentAt) {
+    const toEmail = depositData?.userEmail || userSnap.data()?.email;
+    if (toEmail) {
+      try {
+        const emailRes = await sendDepositApprovedEmail({
+          toEmail,
+          fullName: userSnap.data()?.fullName || userSnap.data()?.username || "",
+          depositId: depositId,
+          amount: Number(amount),
+          asset: depositData?.asset,
+          network: depositData?.network,
+          txHash: depositData?.txHash,
+          approvedAtISO: new Date().toISOString(),
+        });
+
+        if (emailRes.success) {
+          await depositRef.update({
+            approvedEmailSentAt: new Date(),
+            approvedEmailProvider: "resend",
+          });
+        } else {
+          await depositRef.update({
+            approvedEmailError: String(
+              (emailRes as any)?.error?.message || (emailRes as any)?.error || "Email failed",
+            ).slice(0, 500),
+          });
+        }
+      } catch (emailErr: any) {
+        await depositRef.update({
+          approvedEmailError: String(emailErr?.message || emailErr || "Email failed").slice(0, 500),
+        });
+      }
+    }
+  }
 
   return { success: true };
 }

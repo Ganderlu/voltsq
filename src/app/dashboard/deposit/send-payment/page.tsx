@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { Box, Typography, Button, Card } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "../../../firebase/firebaseClient";
+import { auth } from "../../../firebase/firebaseClient";
 
 const paymentConfig = {
   USDT: { name: "USDT (TRC20)", network: "TRC20" },
@@ -47,17 +46,26 @@ export default function SendPaymentPage() {
     try {
       setLoading(true);
 
-      const docRef = await addDoc(collection(db, "deposits"), {
-        userId: user.uid,
-        coin,
-        network,
-        address,
-        amount: Number(amount),
-        status: "pending",
-        createdAt: serverTimestamp(),
+      const token = await user.getIdToken(true);
+      const res = await fetch("/api/deposits/request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          coin,
+          network,
+          address,
+          amount: Number(amount),
+        }),
       });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(json?.error || "Failed to submit payment");
+      }
 
-      router.push(`/dashboard/deposit/confirmation?id=${docRef.id}`);
+      router.push(`/dashboard/deposit/confirmation?id=${json.id}`);
     } catch (error) {
       console.error("Deposit error:", error);
       alert("Failed to submit payment. Try again.");

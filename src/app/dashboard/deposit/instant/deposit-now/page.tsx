@@ -19,8 +19,6 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "@/app/firebase/firebaseClient";
 import { ArrowLeft, Info } from "lucide-react";
 
 const WALLET_MAP: Record<string, { network: string; address: string }[]> = {
@@ -90,18 +88,26 @@ export default function DepositNowPage() {
 
     try {
       setSubmitting(true);
-      await addDoc(collection(db, "deposits"), {
-        userId: currentUser.uid,
-        userEmail: currentUser.email || "",
-        asset: asset ? asset.toUpperCase() : "CRYPTO",
-        network: selectedWallet.network,
-        address: selectedWallet.address,
-        amount: amt,
-        txHash: txHash.trim(),
-        proofUrl: proofUrl.trim(),
-        status: "pending",
-        createdAt: serverTimestamp(),
+      const token = await currentUser.getIdToken(true);
+      const res = await fetch("/api/deposits/request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          asset: asset ? asset.toUpperCase() : "CRYPTO",
+          network: selectedWallet.network,
+          address: selectedWallet.address,
+          amount: amt,
+          txHash: txHash.trim(),
+          proofUrl: proofUrl.trim(),
+        }),
       });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(json?.error || "Failed to submit deposit");
+      }
       setSnackbar({ open: true, msg: "Deposit submitted successfully", severity: "success" });
       setTimeout(() => router.replace("/dashboard/deposit/instant"), 800);
     } catch (e: any) {
@@ -243,4 +249,3 @@ export default function DepositNowPage() {
     </Box>
   );
 }
-
