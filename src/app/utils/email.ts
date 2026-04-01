@@ -20,7 +20,7 @@ export async function sendWelcomeEmail(email: string, fullName: string) {
     }
 
     const { data, error } = await resendClient.emails.send({
-      from: 'Voltsq Investments <onboarding@resend.dev>', // Replace with your verified domain
+      from: 'Voltsq Investments <noreply@voltsq.com>', // Replace with your verified domain
       to: [email],
       subject: 'Welcome to Voltsq Investments! 🚀',
       html: `
@@ -117,7 +117,7 @@ export async function sendWithdrawalApprovedEmail(params: {
     const amountText = `$${Number(params.amount).toFixed(2)}`;
 
     const { data, error } = await resendClient.emails.send({
-      from: "Voltsq Investments <onboarding@resend.dev>",
+      from: "Voltsq Investments <noreply@voltsq.com>",
       to: [params.toEmail],
       subject: "Your withdrawal has been approved",
       html: `
@@ -215,7 +215,7 @@ export async function sendDepositApprovedEmail(params: {
     const txText = params.txHash ? `${params.txHash.slice(0, 10)}...${params.txHash.slice(-6)}` : "N/A";
 
     const { data, error } = await resendClient.emails.send({
-      from: "Voltsq Investments <onboarding@resend.dev>",
+      from: "Voltsq Investments <noreply@voltsq.com>",
       to: [params.toEmail],
       subject: "Your deposit has been approved",
       html: `
@@ -318,7 +318,7 @@ export async function sendAdminDepositRequestEmail(params: {
     const txText = params.txHash ? `${params.txHash.slice(0, 10)}...${params.txHash.slice(-6)}` : "N/A";
 
     const { data, error } = await resendClient.emails.send({
-      from: "Voltsq Investments <onboarding@resend.dev>",
+      from: "Voltsq Investments <noreply@voltsq.com>",
       to: recipients,
       subject: "New deposit request submitted",
       html: `
@@ -419,7 +419,7 @@ export async function sendAdminWithdrawalRequestEmail(params: {
     const addressText = params.address ? maskAddress(params.address) : "N/A";
 
     const { data, error } = await resendClient.emails.send({
-      from: "Voltsq Investments <onboarding@resend.dev>",
+      from: "Voltsq Investments <noreply@voltsq.com>",
       to: recipients,
       subject: "New withdrawal request submitted",
       html: `
