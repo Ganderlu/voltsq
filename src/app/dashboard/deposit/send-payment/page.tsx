@@ -1,9 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Box, Typography, Button, Card } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  Card,
+  CircularProgress,
+  Stack,
+} from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
 import { auth } from "../../../firebase/firebaseClient";
+import { db } from "../../../firebase/firebaseClient";
+import { doc, onSnapshot } from "firebase/firestore";
+
+type WalletEntry = { network: string; address: string };
 
 const paymentConfig = {
   USDT: { name: "USDT (TRC20)", network: "TRC20" },
@@ -13,19 +24,67 @@ const paymentConfig = {
   XRP: { name: "XRP", network: "XRP" },
 };
 
+const coinToAssetKey: Record<string, string> = {
+  USDT: "usdt",
+  Bitcoin: "bitcoin",
+  Ethereum: "ethereum",
+  Solana: "solana",
+  XRP: "xrp",
+};
+
 export default function SendPaymentPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
+  const [walletsLoading, setWalletsLoading] = useState(true);
 
   const coin = searchParams.get("coin");
   const network = searchParams.get("network");
-  const address = searchParams.get("address");
+  const urlAddress = searchParams.get("address");
   const amount = searchParams.get("amount");
+
+  const [resolvedAddress, setResolvedAddress] = useState<string>(
+    urlAddress || "",
+  );
 
   const payment = coin
     ? paymentConfig[coin as keyof typeof paymentConfig]
     : null;
+
+  useEffect(() => {
+    if (!coin) {
+      setWalletsLoading(false);
+      return;
+    }
+    const assetKey = coinToAssetKey[coin] || coin.toLowerCase();
+    const ref = doc(db, "system", "settings");
+    return onSnapshot(
+      ref,
+      (snap) => {
+        if (snap.exists()) {
+          const data = snap.data() as any;
+          if (data?.walletAddresses) {
+            const wallets: WalletEntry[] = data.walletAddresses[assetKey] || [];
+            const configured = wallets.filter(
+              (w) => w.address && w.address.trim(),
+            );
+            if (configured.length > 0) {
+              const net = network ? network.toUpperCase() : "";
+              const match = configured.find(
+                (w) => w.network.toUpperCase() === net,
+              );
+              const chosen = match || configured[0];
+              setResolvedAddress(chosen.address);
+            }
+          }
+        }
+        setWalletsLoading(false);
+      },
+      () => {
+        setWalletsLoading(false);
+      },
+    );
+  }, [coin, network]);
 
   useEffect(() => {
     if (!payment || !amount) {
@@ -35,11 +94,51 @@ export default function SendPaymentPage() {
 
   if (!payment || !amount) return null;
 
+  if (walletsLoading) {
+    return (
+      <Box
+        minHeight="100vh"
+        px={{ xs: 2, md: 6 }}
+        py={6}
+        sx={{ bgcolor: "transparent", color: "var(--foreground)" }}
+      >
+        <Card
+          sx={{
+            maxWidth: 520,
+            mx: "auto",
+            p: 5,
+            bgcolor: "var(--card)",
+            color: "var(--card-foreground)",
+            borderRadius: 3,
+            border: "1px solid",
+            borderColor: "var(--border)",
+          }}
+        >
+          <Stack spacing={2} alignItems="center">
+            <CircularProgress size={32} sx={{ color: "primary.main" }} />
+            <Typography sx={{ color: "var(--muted-foreground)" }}>
+              Loading wallet address...
+            </Typography>
+          </Stack>
+        </Card>
+      </Box>
+    );
+  }
+
+  const finalAddress = resolvedAddress || urlAddress || "";
+  const finalNetwork = network || payment?.network || "";
+  const noAddressConfigured = !finalAddress;
+
   const handleSubmitPayment = async () => {
     const user = auth.currentUser;
 
     if (!user) {
       alert("You must be logged in");
+      return;
+    }
+
+    if (noAddressConfigured) {
+      alert("Wallet address not configured by admin. Please try again later.");
       return;
     }
 
@@ -55,8 +154,8 @@ export default function SendPaymentPage() {
         },
         body: JSON.stringify({
           coin,
-          network,
-          address,
+          network: finalNetwork,
+          address: finalAddress,
           amount: Number(amount),
         }),
       });
@@ -93,7 +192,9 @@ export default function SendPaymentPage() {
           color: "var(--card-foreground)",
           borderRadius: 3,
           border: "1px solid",
-          borderColor: "var(--border)",
+          borderColor: noAddressConfigured
+            ? "rgba(239, 68, 68, 0.4)"
+            : "var(--border)",
         }}
       >
         <Typography fontWeight={700} fontSize={22} mb={2}>
@@ -108,13 +209,21 @@ export default function SendPaymentPage() {
         <Typography fontSize={14} color="text.secondary">
           Network
         </Typography>
-        <Typography mb={2}>{network}</Typography>
+        <Typography mb={2}>{finalNetwork || "—"}</Typography>
 
         <Typography fontSize={14} color="text.secondary">
           Wallet Address
         </Typography>
-        <Typography mb={2} sx={{ wordBreak: "break-all" }}>
-          {address}
+        <Typography
+          mb={2}
+          sx={{
+            wordBreak: "break-all",
+            color: noAddressConfigured ? "#ef4444" : "inherit",
+          }}
+        >
+          {noAddressConfigured
+            ? "Not configured — please contact admin"
+            : finalAddress}
         </Typography>
 
         <Typography fontSize={14} color="text.secondary">
@@ -125,16 +234,24 @@ export default function SendPaymentPage() {
         <Button
           fullWidth
           size="large"
-          disabled={loading}
+          disabled={loading || noAddressConfigured}
           sx={{
             bgcolor: "primary.main",
             color: "primary.contrastText",
             fontWeight: 600,
             "&:hover": { bgcolor: "primary.dark" },
+            "&.Mui-disabled": {
+              bgcolor: "rgba(37, 99, 235, 0.3)",
+              color: "rgba(255,255,255,0.5)",
+            },
           }}
           onClick={handleSubmitPayment}
         >
-          {loading ? "Submitting..." : "I Have Sent Payment"}
+          {loading
+            ? "Submitting..."
+            : noAddressConfigured
+              ? "Wallet Not Available"
+              : "I Have Sent Payment"}
         </Button>
       </Card>
     </Box>

@@ -14,22 +14,28 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  CircularProgress,
 } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { ArrowLeft, Info } from "lucide-react";
+import { db } from "@/app/firebase/firebaseClient";
+import { doc, onSnapshot } from "firebase/firestore";
 
-const WALLET_MAP: Record<string, { network: string; address: string }[]> = {
-  bitcoin: [{ network: "BTC", address: "bc1qpj0v3t5vy59f53zssfk97ke5pa43pzj93rqcmv" }],
-  ethereum: [{ network: "ERC20", address: "0x0d25Fd5c383e60BD9161466388a9Fe8d7A1CD64b" }],
-  "bnb smart chain": [{ network: "BEP20", address: "0x0d25Fd5c383e60BD9161466388a9Fe8d7A1CD64b" }],
-  tron: [{ network: "TRC20", address: "TEbzLKYdWKpmw9MULZKJrZdNFtNTzd8taz" }],
+type WalletEntry = { network: string; address: string };
+
+const FALLBACK_WALLET_MAP: Record<string, WalletEntry[]> = {
+  bitcoin: [{ network: "BTC", address: "" }],
+  ethereum: [{ network: "ERC20", address: "" }],
+  "bnb smart chain": [{ network: "BEP20", address: "" }],
+  tron: [{ network: "TRC20", address: "" }],
   usdt: [
-    { network: "TRC20", address: "TEbzLKYdWKpmw9MULZKJrZdNFtNTzd8taz" }
+    { network: "TRC20", address: "" },
+    { network: "ERC20", address: "" },
   ],
-  solana: [{ network: "SOL", address: "7AQfzDdWcSs3GnYJwZ1d2RaxaeXhhfpWixk4JCohVqLh" }],
+  solana: [{ network: "SOL", address: "" }],
 };
 
 export default function DepositNowPage() {
@@ -42,20 +48,72 @@ export default function DepositNowPage() {
   const asset = (params.get("gateway") || "").toLowerCase();
   const requestedNetwork = params.get("network") || "";
 
-  const wallets = useMemo(() => WALLET_MAP[asset] || [], [asset]);
+  const [walletMap, setWalletMap] =
+    useState<Record<string, WalletEntry[]>>(FALLBACK_WALLET_MAP);
+  const [walletsLoading, setWalletsLoading] = useState(true);
+
+  useEffect(() => {
+    const ref = doc(db, "system", "settings");
+    return onSnapshot(
+      ref,
+      (snap) => {
+        if (snap.exists()) {
+          const data = snap.data() as any;
+          if (data?.walletAddresses) {
+            const merged: Record<string, WalletEntry[]> = {
+              ...FALLBACK_WALLET_MAP,
+            };
+            Object.entries(data.walletAddresses).forEach(([k, v]) => {
+              const entry = v as WalletEntry[];
+              if (Array.isArray(entry) && entry.length > 0) {
+                merged[k] = entry;
+              }
+            });
+            setWalletMap(merged);
+          }
+        }
+        setWalletsLoading(false);
+      },
+      () => {
+        setWalletsLoading(false);
+      },
+    );
+  }, []);
+
+  const wallets = useMemo(() => {
+    const w = walletMap[asset] || FALLBACK_WALLET_MAP[asset] || [];
+    return w.filter(
+      (entry) => entry && entry.address && entry.address.trim() !== "",
+    );
+  }, [walletMap, asset]);
+
   const initialNetwork = useMemo(() => {
-    const match = wallets.find((w) => w.network.toLowerCase() === requestedNetwork.toLowerCase());
+    const match = wallets.find(
+      (w) => w.network.toLowerCase() === requestedNetwork.toLowerCase(),
+    );
     return match?.network || wallets[0]?.network || "";
   }, [wallets, requestedNetwork]);
 
   const [network, setNetwork] = useState<string>(initialNetwork);
-  const selectedWallet = useMemo(() => wallets.find((w) => w.network === network) || wallets[0], [wallets, network]);
+
+  useEffect(() => {
+    if (initialNetwork) setNetwork(initialNetwork);
+  }, [initialNetwork]);
+
+  const selectedWallet = useMemo(
+    () => wallets.find((w) => w.network === network) || wallets[0],
+    [wallets, network],
+  );
 
   const [amount, setAmount] = useState<string>("");
   const [txHash, setTxHash] = useState<string>("");
   const [proofUrl, setProofUrl] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
-  const [snackbar, setSnackbar] = useState<{ open: boolean; msg: string; severity: "success" | "error" }>({
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    msg: string;
+    severity: "success" | "error";
+  }>({
     open: false,
     msg: "",
     severity: "success",
@@ -73,16 +131,28 @@ export default function DepositNowPage() {
 
   const submit = async () => {
     if (!currentUser) {
-      setSnackbar({ open: true, msg: "Please login to continue", severity: "error" });
+      setSnackbar({
+        open: true,
+        msg: "Please login to continue",
+        severity: "error",
+      });
       return;
     }
     const amt = Number(amount);
     if (!selectedWallet || !Number.isFinite(amt) || amt <= 0) {
-      setSnackbar({ open: true, msg: "Enter a valid amount", severity: "error" });
+      setSnackbar({
+        open: true,
+        msg: "Enter a valid amount",
+        severity: "error",
+      });
       return;
     }
     if (!txHash.trim()) {
-      setSnackbar({ open: true, msg: "Transaction hash is required", severity: "error" });
+      setSnackbar({
+        open: true,
+        msg: "Transaction hash is required",
+        severity: "error",
+      });
       return;
     }
 
@@ -108,17 +178,31 @@ export default function DepositNowPage() {
       if (!res.ok) {
         throw new Error(json?.error || "Failed to submit deposit");
       }
-      setSnackbar({ open: true, msg: "Deposit submitted successfully", severity: "success" });
+      setSnackbar({
+        open: true,
+        msg: "Deposit submitted successfully",
+        severity: "success",
+      });
       setTimeout(() => router.replace("/dashboard/deposit/instant"), 800);
     } catch (e: any) {
-      setSnackbar({ open: true, msg: e?.message || "Failed to submit deposit", severity: "error" });
+      setSnackbar({
+        open: true,
+        msg: e?.message || "Failed to submit deposit",
+        severity: "error",
+      });
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 }, bgcolor: "var(--background)", minHeight: "100vh" }}>
+    <Box
+      sx={{
+        p: { xs: 2, md: 4 },
+        bgcolor: "var(--background)",
+        minHeight: "100vh",
+      }}
+    >
       <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 3 }}>
         <Button
           variant="outlined"
@@ -129,7 +213,11 @@ export default function DepositNowPage() {
           Back
         </Button>
         <Box>
-          <Typography variant="h5" fontWeight="900" sx={{ color: "var(--foreground)" }}>
+          <Typography
+            variant="h5"
+            fontWeight="900"
+            sx={{ color: "var(--foreground)" }}
+          >
             Deposit Now
           </Typography>
           <Typography variant="body2" sx={{ color: "var(--muted-foreground)" }}>
@@ -138,38 +226,160 @@ export default function DepositNowPage() {
         </Box>
       </Stack>
 
-      {!selectedWallet ? (
-        <Paper elevation={0} sx={{ p: 3, bgcolor: "var(--card)", border: "1px solid", borderColor: "#000000", borderRadius: 4 }}>
+      {walletsLoading ? (
+        <Paper
+          elevation={0}
+          sx={{
+            p: 5,
+            bgcolor: "var(--card)",
+            border: "1px solid",
+            borderColor: "var(--border)",
+            borderRadius: 4,
+          }}
+        >
+          <Stack spacing={2} alignItems="center" justifyContent="center">
+            <CircularProgress size={32} sx={{ color: "primary.main" }} />
+            <Typography sx={{ color: "var(--muted-foreground)" }}>
+              Loading wallet addresses...
+            </Typography>
+          </Stack>
+        </Paper>
+      ) : !asset ? (
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            bgcolor: "var(--card)",
+            border: "1px solid",
+            borderColor: "var(--border)",
+            borderRadius: 4,
+          }}
+        >
           <Typography sx={{ color: "var(--muted-foreground)" }}>
             Please select a gateway from Instant Deposit first.
           </Typography>
-          <Button sx={{ mt: 2, borderRadius: 2.5 }} variant="contained" onClick={() => router.replace("/dashboard/deposit/instant")}>
+          <Button
+            sx={{ mt: 2, borderRadius: 2.5 }}
+            variant="contained"
+            onClick={() => router.replace("/dashboard/deposit/instant")}
+          >
             Go to Instant Deposit
           </Button>
         </Paper>
+      ) : wallets.length === 0 ? (
+        <Paper
+          elevation={0}
+          sx={{
+            p: 4,
+            bgcolor: "var(--card)",
+            border: "1px solid",
+            borderColor: "rgba(239, 68, 68, 0.3)",
+            borderRadius: 4,
+          }}
+        >
+          <Stack spacing={2} alignItems="center" textAlign="center">
+            <Box
+              sx={{
+                width: 56,
+                height: 56,
+                borderRadius: "50%",
+                bgcolor: "rgba(239, 68, 68, 0.1)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Info size={28} color="#ef4444" />
+            </Box>
+            <Typography
+              variant="h6"
+              fontWeight={800}
+              sx={{ color: "var(--foreground)" }}
+            >
+              Wallet Not Configured
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{ color: "var(--muted-foreground)", maxWidth: 420 }}
+            >
+              The admin has not yet configured a deposit wallet for{" "}
+              <strong>{asset.toUpperCase()}</strong>. Please check back later or
+              contact support.
+            </Typography>
+            <Button
+              sx={{ mt: 1, borderRadius: 2.5 }}
+              variant="outlined"
+              onClick={() => router.replace("/dashboard/deposit/instant")}
+            >
+              Back to Gateways
+            </Button>
+          </Stack>
+        </Paper>
       ) : (
         <Stack spacing={3}>
-          <Paper elevation={0} sx={{ p: 2.5, bgcolor: "rgba(99, 102, 241, 0.05)", border: "1px solid rgba(99, 102, 241, 0.12)", borderRadius: 4 }}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2.5,
+              bgcolor: "rgba(99, 102, 241, 0.05)",
+              border: "1px solid rgba(99, 102, 241, 0.12)",
+              borderRadius: 4,
+            }}
+          >
             <Stack direction="row" spacing={1.5} alignItems="center">
               <Info size={18} color="primary.main" />
-              <Typography variant="body2" sx={{ color: "var(--muted-foreground)" }}>
-                Deposits are verified manually. After submission, your request appears in Deposit History.
+              <Typography
+                variant="body2"
+                sx={{ color: "var(--muted-foreground)" }}
+              >
+                Deposits are verified manually. After submission, your request
+                appears in Deposit History.
               </Typography>
             </Stack>
           </Paper>
 
-          <Paper elevation={0} sx={{ p: 3, bgcolor: "var(--card)", border: "1px solid", borderColor: "#000000", borderRadius: 4 }}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              bgcolor: "var(--card)",
+              border: "1px solid",
+              borderColor: "#000000",
+              borderRadius: 4,
+            }}
+          >
             <Stack spacing={2.5}>
-              <Stack direction={{ xs: "column", md: "row" }} spacing={2} justifyContent="space-between" alignItems={{ xs: "flex-start", md: "center" }}>
+              <Stack
+                direction={{ xs: "column", md: "row" }}
+                spacing={2}
+                justifyContent="space-between"
+                alignItems={{ xs: "flex-start", md: "center" }}
+              >
                 <Box>
-                  <Typography variant="h6" fontWeight="900" sx={{ color: "var(--foreground)" }}>
+                  <Typography
+                    variant="h6"
+                    fontWeight="900"
+                    sx={{ color: "var(--foreground)" }}
+                  >
                     {asset.toUpperCase()} — {network}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: "var(--muted-foreground)" }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "var(--muted-foreground)" }}
+                  >
                     Use the exact network shown to avoid loss of funds.
                   </Typography>
                 </Box>
-                <Button variant="outlined" startIcon={<ContentCopyIcon />} onClick={copyAddress} sx={{ borderRadius: 2.5, textTransform: "none", fontWeight: 800 }}>
+                <Button
+                  variant="outlined"
+                  startIcon={<ContentCopyIcon />}
+                  onClick={copyAddress}
+                  sx={{
+                    borderRadius: 2.5,
+                    textTransform: "none",
+                    fontWeight: 800,
+                  }}
+                >
                   Copy Address
                 </Button>
               </Stack>
@@ -182,7 +392,10 @@ export default function DepositNowPage() {
                       label={w.network}
                       onClick={() => setNetwork(w.network)}
                       sx={{
-                        bgcolor: w.network === network ? "rgba(255,255,255,0.06)" : "transparent",
+                        bgcolor:
+                          w.network === network
+                            ? "rgba(255,255,255,0.06)"
+                            : "transparent",
                         border: "1px solid var(--border)",
                         color: "var(--foreground)",
                         fontWeight: 900,
@@ -192,11 +405,25 @@ export default function DepositNowPage() {
                 </Stack>
               )}
 
-              <Box sx={{ p: 2, borderRadius: 3, bgcolor: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <Typography variant="caption" sx={{ color: "var(--muted-foreground)", display: "block" }}>
+              <Box
+                sx={{
+                  p: 2,
+                  borderRadius: 3,
+                  bgcolor: "rgba(255,255,255,0.02)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{ color: "var(--muted-foreground)", display: "block" }}
+                >
                   Wallet Address
                 </Typography>
-                <Typography variant="body2" fontWeight="900" sx={{ color: "var(--foreground)", wordBreak: "break-all" }}>
+                <Typography
+                  variant="body2"
+                  fontWeight="900"
+                  sx={{ color: "var(--foreground)", wordBreak: "break-all" }}
+                >
                   {selectedWallet.address}
                 </Typography>
               </Box>
@@ -211,27 +438,44 @@ export default function DepositNowPage() {
                     onChange={(e) => setAmount(e.target.value)}
                     InputProps={{
                       startAdornment: (
-                        <InputAdornment position="start">
-                          $
-                        </InputAdornment>
+                        <InputAdornment position="start">$</InputAdornment>
                       ),
                     }}
                   />
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
-                  <TextField fullWidth label="Transaction Hash" value={txHash} onChange={(e) => setTxHash(e.target.value)} />
+                  <TextField
+                    fullWidth
+                    label="Transaction Hash"
+                    value={txHash}
+                    onChange={(e) => setTxHash(e.target.value)}
+                  />
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
-                  <TextField fullWidth label="Proof URL (optional)" value={proofUrl} onChange={(e) => setProofUrl(e.target.value)} />
+                  <TextField
+                    fullWidth
+                    label="Proof URL (optional)"
+                    value={proofUrl}
+                    onChange={(e) => setProofUrl(e.target.value)}
+                  />
                 </Grid>
               </Grid>
 
-              <Stack direction={{ xs: "column", md: "row" }} spacing={2} justifyContent="flex-end">
+              <Stack
+                direction={{ xs: "column", md: "row" }}
+                spacing={2}
+                justifyContent="flex-end"
+              >
                 <Button
                   variant="contained"
                   onClick={submit}
                   disabled={submitting}
-                  sx={{ borderRadius: 2.5, fontWeight: 900, py: 1.2, width: isMobile ? "100%" : "auto" }}
+                  sx={{
+                    borderRadius: 2.5,
+                    fontWeight: 900,
+                    py: 1.2,
+                    width: isMobile ? "100%" : "auto",
+                  }}
                 >
                   {submitting ? "Submitting..." : "Submit Deposit"}
                 </Button>
@@ -241,8 +485,16 @@ export default function DepositNowPage() {
         </Stack>
       )}
 
-      <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={() => setSnackbar((s) => ({ ...s, open: false }))}>
-        <Alert severity={snackbar.severity} variant="filled" sx={{ borderRadius: 3 }}>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+      >
+        <Alert
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ borderRadius: 3 }}
+        >
           {snackbar.msg}
         </Alert>
       </Snackbar>
