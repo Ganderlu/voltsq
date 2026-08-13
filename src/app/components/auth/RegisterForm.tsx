@@ -126,7 +126,7 @@ export default function RegisterPersonalInfoPage() {
             <Input
               name="phone"
               label="Phone Number"
-              placeholder="+1 (555) 123-4567"
+              placeholder="+595 992 336717"
             />
           </div>
 

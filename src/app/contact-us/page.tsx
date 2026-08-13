@@ -156,7 +156,7 @@ export default function ContactUsPage() {
                       variant="body1"
                       sx={{ color: "var(--primary)", fontWeight: "medium" }}
                     >
-                      +1 (555) 123-4567
+                      +595 992 336717
                     </Typography>
                   </Box>
                 </CardContent>
