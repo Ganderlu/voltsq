@@ -9,6 +9,7 @@ export async function updateUserBalance(uid: string, amount: number) {
 
   await adminDb.doc(`users/${uid}`).update({
     usdtBalance: FieldValue.increment(amount),
+    walletBalance: FieldValue.increment(amount),
   });
 
   return { success: true };
@@ -60,6 +61,7 @@ export async function approveDeposit(deposit: any) {
 
   await userRef.update({
     usdtBalance: FieldValue.increment(amount),
+    walletBalance: FieldValue.increment(amount),
   });
 
   // 3️⃣ Check for referral commission
@@ -103,7 +105,8 @@ export async function approveDeposit(deposit: any) {
       try {
         const emailRes = await sendDepositApprovedEmail({
           toEmail,
-          fullName: userSnap.data()?.fullName || userSnap.data()?.username || "",
+          fullName:
+            userSnap.data()?.fullName || userSnap.data()?.username || "",
           depositId: depositId,
           amount: Number(amount),
           asset: depositData?.asset,
@@ -120,13 +123,17 @@ export async function approveDeposit(deposit: any) {
         } else {
           await depositRef.update({
             approvedEmailError: String(
-              (emailRes as any)?.error?.message || (emailRes as any)?.error || "Email failed",
+              (emailRes as any)?.error?.message ||
+                (emailRes as any)?.error ||
+                "Email failed",
             ).slice(0, 500),
           });
         }
       } catch (emailErr: any) {
         await depositRef.update({
-          approvedEmailError: String(emailErr?.message || emailErr || "Email failed").slice(0, 500),
+          approvedEmailError: String(
+            emailErr?.message || emailErr || "Email failed",
+          ).slice(0, 500),
         });
       }
     }
@@ -162,6 +169,7 @@ export async function approvePinRecharge(rechargeId: string) {
   // 1️⃣ Update user balance
   await adminDb.doc(`users/${userId}`).update({
     usdtBalance: FieldValue.increment(netCredit),
+    walletBalance: FieldValue.increment(netCredit),
   });
 
   // 2️⃣ Update recharge status
@@ -221,6 +229,7 @@ export async function settleInvestment(investmentId: string) {
 
     tx.update(userRef, {
       usdtBalance: FieldValue.increment(amount + profit),
+      walletBalance: FieldValue.increment(amount + profit),
     });
 
     tx.update(invRef, {
@@ -252,6 +261,30 @@ export async function toggleAdminStatus(uid: string, isAdmin: boolean) {
   await adminDb
     .doc(`users/${uid}`)
     .update({ role: isAdmin ? "admin" : "user" });
+
+  return { success: true };
+}
+
+export async function changeUserPassword(uid: string, newPassword: string) {
+  if (!adminAuth) throw new Error("Admin Auth not initialized");
+  if (!adminDb) throw new Error("Admin DB not initialized");
+
+  if (!newPassword || newPassword.length < 6) {
+    throw new Error("Password must be at least 6 characters long");
+  }
+
+  await adminAuth.updateUser(uid, {
+    password: newPassword,
+  });
+
+  await adminDb.collection("notifications").add({
+    userId: uid,
+    type: "password-changed",
+    title: "Password Updated",
+    message: "Your account password has been changed by an administrator.",
+    read: false,
+    createdAt: new Date(),
+  });
 
   return { success: true };
 }

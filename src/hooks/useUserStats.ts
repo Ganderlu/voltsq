@@ -40,11 +40,12 @@ export function useUserStats() {
         const d = snap.data();
         setStats((s) => ({
           ...s,
-          balance: d.usdtBalance || 0,
-          balanceDemo: d.balanceDemo || 0,
-          balanceLive: d.balanceLive || 0,
+          // Primary balance field = usdtBalance, fallback to walletBalance for legacy users
+          balance: d.usdtBalance ?? d.walletBalance ?? 0,
+          balanceDemo: d.balanceDemo ?? 10000,
+          balanceLive: d.balanceLive ?? 0,
           mode: d.mode || "demo",
-          username: d.username || "User",
+          username: d.username || d.fullName || "User",
         }));
       }
     });

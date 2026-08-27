@@ -27,15 +27,19 @@ export async function settleTrade(tradeId: string, closePrice: number) {
   const balanceField = trade.mode === "demo" ? "balanceDemo" : "usdtBalance";
 
   if (won) {
-    await userRef.update({
+    const updates: any = {
       [balanceField]: FieldValue.increment(trade.amount + profit),
-    });
+    };
+    if (trade.mode === "live") {
+      updates.walletBalance = FieldValue.increment(trade.amount + profit);
+    }
+    await userRef.update(updates);
 
     // 💰 REFERRAL COMMISSION ON PROFITS (Live mode only)
     if (trade.mode === "live" && trade.uid) {
       const userSnap = await userRef.get();
       const userData = userSnap.data();
-      
+
       if (userData?.referredBy) {
         const commissionRate = 0.02; // 2% commission on trade profits
         const commissionAmount = profit * commissionRate;
@@ -43,7 +47,8 @@ export async function settleTrade(tradeId: string, closePrice: number) {
         if (commissionAmount > 0) {
           // Update Referrer Balance
           await adminDb.doc(`users/${userData.referredBy}`).update({
-            usdtBalance: FieldValue.increment(commissionAmount)
+            usdtBalance: FieldValue.increment(commissionAmount),
+            walletBalance: FieldValue.increment(commissionAmount),
           });
 
           // Log Reward Transaction
@@ -55,7 +60,7 @@ export async function settleTrade(tradeId: string, closePrice: number) {
             type: "trade_commission",
             tradeId: tradeId,
             profitAmount: profit,
-            timestamp: new Date()
+            timestamp: new Date(),
           });
         }
       }

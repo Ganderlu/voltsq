@@ -3,9 +3,15 @@
 import { adminDb } from "../firebase/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 
-export async function createInvestment(userId: string, plan: any, amount: number) {
+export async function createInvestment(
+  userId: string,
+  plan: any,
+  amount: number,
+) {
   if (!adminDb) {
-    throw new Error("Firebase Admin not initialized. Check .env.local and restart the server.");
+    throw new Error(
+      "Firebase Admin not initialized. Check .env.local and restart the server.",
+    );
   }
 
   if (!userId || !plan || !amount || amount <= 0) {
@@ -14,7 +20,7 @@ export async function createInvestment(userId: string, plan: any, amount: number
 
   const userRef = adminDb.doc(`users/${userId}`);
   const userSnap = await userRef.get();
-  
+
   if (!userSnap.exists) {
     throw new Error("User not found");
   }
@@ -28,13 +34,16 @@ export async function createInvestment(userId: string, plan: any, amount: number
 
   // 1️⃣ Deduct balance from user
   await userRef.update({
-    usdtBalance: FieldValue.increment(-amount)
+    usdtBalance: FieldValue.increment(-amount),
+    walletBalance: FieldValue.increment(-amount),
   });
 
   // 2️⃣ Create investment record
   const startAt = new Date();
   const durationDays = parseInt(plan.duration) || 0;
-  const matureAt = new Date(startAt.getTime() + durationDays * 24 * 60 * 60 * 1000);
+  const matureAt = new Date(
+    startAt.getTime() + durationDays * 24 * 60 * 60 * 1000,
+  );
 
   // Parse interest (e.g., "2%" -> 0.02)
   const interestRate = parseFloat(plan.interest) / 100 || 0;
@@ -55,13 +64,14 @@ export async function createInvestment(userId: string, plan: any, amount: number
 
   // 3️⃣ Pay referral commission (5% on investment amount)
   if (userData?.referredBy) {
-    const commissionRate = 0.05; 
+    const commissionRate = 0.05;
     const commissionAmount = amount * commissionRate;
 
     if (commissionAmount > 0) {
       // Update Referrer Balance
       await adminDb.doc(`users/${userData.referredBy}`).update({
-        usdtBalance: FieldValue.increment(commissionAmount)
+        usdtBalance: FieldValue.increment(commissionAmount),
+        walletBalance: FieldValue.increment(commissionAmount),
       });
 
       // Log Referral Reward
@@ -73,7 +83,7 @@ export async function createInvestment(userId: string, plan: any, amount: number
         type: "investment_commission",
         investmentAmount: amount,
         planName: plan.title,
-        timestamp: new Date()
+        timestamp: new Date(),
       });
     }
   }

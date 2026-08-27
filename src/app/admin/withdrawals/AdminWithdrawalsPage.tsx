@@ -36,6 +36,7 @@ export default function AdminWithdrawals() {
       userRef,
       {
         usdtBalance: increment(-w.amount),
+        walletBalance: increment(-w.amount),
       },
       { merge: true },
     );

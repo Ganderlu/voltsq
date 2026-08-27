@@ -38,7 +38,8 @@ export default function TradeNowPage() {
   const isTablet = useMediaQuery(theme.breakpoints.down("xl"));
   const { currentUser } = useAuth();
   const stats = useUserStats();
-  const balance = stats.mode === "demo" ? stats.balanceDemo : stats.balanceLive;
+  // ✅ LIVE mode = usdtBalance (stats.balance), DEMO mode = balanceDemo
+  const balance = stats.mode === "demo" ? stats.balanceDemo : stats.balance;
 
   const handleModeToggle = async () => {
     if (!currentUser) return;

@@ -175,6 +175,7 @@ export async function completeRegistration(formData: FormData) {
         balanceDemo: 10000,
         balanceLive: 0,
         usdtBalance: 0,
+        walletBalance: 0,
         totalTrades: 0,
         activeTrades: 0,
         totalPnL: 0,
@@ -193,6 +194,7 @@ export async function completeRegistration(formData: FormData) {
         .doc(data.referredBy)
         .update({
           usdtBalance: FieldValue.increment(rewardAmount),
+          walletBalance: FieldValue.increment(rewardAmount),
         });
 
       // Log Reward Transaction

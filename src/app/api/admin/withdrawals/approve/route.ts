@@ -123,6 +123,7 @@ export async function POST(req: Request) {
 
       tx.update(userRef, {
         usdtBalance: FieldValue.increment(-amount),
+        walletBalance: FieldValue.increment(-amount),
       });
 
       tx.update(withdrawalRef, {

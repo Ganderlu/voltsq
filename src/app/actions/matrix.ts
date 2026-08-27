@@ -5,7 +5,9 @@ import { FieldValue } from "firebase-admin/firestore";
 
 export async function enrollInMatrix(userId: string, plan: any) {
   if (!adminDb) {
-    throw new Error("Firebase Admin not initialized. Check .env.local and restart the server.");
+    throw new Error(
+      "Firebase Admin not initialized. Check .env.local and restart the server.",
+    );
   }
 
   if (!userId || !plan) {
@@ -14,7 +16,7 @@ export async function enrollInMatrix(userId: string, plan: any) {
 
   const userRef = adminDb.doc(`users/${userId}`);
   const userSnap = await userRef.get();
-  
+
   if (!userSnap.exists) {
     throw new Error("User not found");
   }
@@ -29,7 +31,8 @@ export async function enrollInMatrix(userId: string, plan: any) {
 
   // 1️⃣ Deduct balance from user
   await userRef.update({
-    usdtBalance: FieldValue.increment(-price)
+    usdtBalance: FieldValue.increment(-price),
+    walletBalance: FieldValue.increment(-price),
   });
 
   // 2️⃣ Create matrix enrollment record
@@ -52,7 +55,8 @@ export async function enrollInMatrix(userId: string, plan: any) {
     if (rewardAmount > 0) {
       // Update Referrer Balance
       await adminDb.doc(`users/${userData.referredBy}`).update({
-        usdtBalance: FieldValue.increment(rewardAmount)
+        usdtBalance: FieldValue.increment(rewardAmount),
+        walletBalance: FieldValue.increment(rewardAmount),
       });
 
       // Log Referral Reward
@@ -63,7 +67,7 @@ export async function enrollInMatrix(userId: string, plan: any) {
         amount: rewardAmount,
         type: "matrix_commission",
         planTitle: plan.title,
-        timestamp: new Date()
+        timestamp: new Date(),
       });
     }
   }

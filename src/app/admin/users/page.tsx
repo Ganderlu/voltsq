@@ -55,7 +55,7 @@ export default async function ManageUsersPage() {
         kyc: data.kycStatus || "pending",
         status: data.status || "active",
         joined: joinedDate,
-        walletBalance: Number(data.walletBalance ?? 0),
+        walletBalance: Number(data.usdtBalance ?? data.walletBalance ?? 0),
         ipAddress: data.ipAddress || "N/A",
         country: data.country || "N/A",
         detectedCountry: data.detectedCountry || "N/A",

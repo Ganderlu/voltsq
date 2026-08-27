@@ -35,6 +35,7 @@ export async function placeTrade({
       balanceDemo: 10000,
       balanceLive: 0,
       usdtBalance: 0,
+      walletBalance: 0,
       createdAt: new Date(),
     };
     await userRef.set(defaultProfile);
@@ -43,17 +44,17 @@ export async function placeTrade({
 
   const mode = user?.mode || "demo";
   const balanceField = mode === "demo" ? "balanceDemo" : "usdtBalance";
-  
+
   // 🛠️ AUTO-FIX: Ensure balance exists for demo
   let currentBalance = user?.[balanceField];
-  
+
   if (currentBalance === undefined || currentBalance === null) {
-      if (mode === "demo") {
-          currentBalance = 10000;
-          await userRef.update({ balanceDemo: 10000 });
-      } else {
-          currentBalance = 0;
-      }
+    if (mode === "demo") {
+      currentBalance = 10000;
+      await userRef.update({ balanceDemo: 10000 });
+    } else {
+      currentBalance = 0;
+    }
   }
 
   if (currentBalance < amount) {
@@ -61,9 +62,13 @@ export async function placeTrade({
   }
 
   // 🔻 Deduct balance immediately
-  await userRef.update({
+  const updates: any = {
     [balanceField]: currentBalance - amount,
-  });
+  };
+  if (mode === "live") {
+    updates.walletBalance = currentBalance - amount;
+  }
+  await userRef.update(updates);
 
   const expiresAt = new Date(Date.now() + duration * 1000);
 

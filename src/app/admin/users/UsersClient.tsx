@@ -46,6 +46,9 @@ import {
   Plus,
   Minus,
   Trash2,
+  Key,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -53,6 +56,7 @@ import {
   updateUserStatus,
   deleteUser,
   toggleAdminStatus,
+  changeUserPassword,
 } from "@/app/actions/admin";
 
 export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
@@ -74,6 +78,17 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
     userId: "",
     currentBalance: 0,
     amount: "",
+  });
+
+  // Password Modal State
+  const [passwordModal, setPasswordModal] = useState({
+    open: false,
+    userId: "",
+    userName: "",
+    newPassword: "",
+    confirmPassword: "",
+    showPassword: false,
+    showConfirm: false,
   });
 
   const filteredUsers = users.filter((u: any) =>
@@ -192,6 +207,60 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
       });
     } finally {
       setLoading(null);
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    const { userId, newPassword, confirmPassword } = passwordModal;
+
+    if (!newPassword || newPassword.length < 6) {
+      setSnackbar({
+        open: true,
+        message: "Password must be at least 6 characters long",
+        severity: "error",
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setSnackbar({
+        open: true,
+        message: "Passwords do not match",
+        severity: "error",
+      });
+      return;
+    }
+
+    setLoading(userId);
+    const targetUserId = userId;
+    setPasswordModal((prev) => ({ ...prev, open: false }));
+
+    try {
+      const result = await changeUserPassword(targetUserId, newPassword);
+      if (result.success) {
+        setSnackbar({
+          open: true,
+          message: "User password changed successfully",
+          severity: "success",
+        });
+      }
+    } catch (err: any) {
+      setSnackbar({
+        open: true,
+        message: err.message || "Failed to change password",
+        severity: "error",
+      });
+    } finally {
+      setLoading(null);
+      setPasswordModal({
+        open: false,
+        userId: "",
+        userName: "",
+        newPassword: "",
+        confirmPassword: "",
+        showPassword: false,
+        showConfirm: false,
+      });
     }
   };
 
@@ -341,6 +410,17 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
                   userId: u.id,
                   currentBalance: u.walletBalance || 0,
                   amount: "",
+                })
+              }
+              onPasswordClick={() =>
+                setPasswordModal({
+                  open: true,
+                  userId: u.id,
+                  userName: u.fullName || "User",
+                  newPassword: "",
+                  confirmPassword: "",
+                  showPassword: false,
+                  showConfirm: false,
                 })
               }
               loading={loading === u.id}
@@ -631,6 +711,37 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
                           <Wallet size={16} />
                         </IconButton>
                       </Tooltip>
+                      <Tooltip title="Change Password">
+                        <IconButton
+                          className="action-btn"
+                          size="small"
+                          disabled={loading === u.id}
+                          sx={{
+                            color: "#f59e0b",
+                            bgcolor: "rgba(245, 158, 11, 0.1)",
+                            opacity: 0.6,
+                            transition: "all 0.2s",
+                            "&:hover": {
+                              bgcolor: "#f59e0b",
+                              color: "#fff",
+                              transform: "scale(1.1)",
+                            },
+                          }}
+                          onClick={() =>
+                            setPasswordModal({
+                              open: true,
+                              userId: u.id,
+                              userName: u.fullName || "User",
+                              newPassword: "",
+                              confirmPassword: "",
+                              showPassword: false,
+                              showConfirm: false,
+                            })
+                          }
+                        >
+                          <Key size={16} />
+                        </IconButton>
+                      </Tooltip>
                       <Tooltip
                         title={
                           u.isAdmin
@@ -820,6 +931,187 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
         </DialogActions>
       </Dialog>
 
+      {/* Password Change Modal */}
+      <Dialog
+        open={passwordModal.open}
+        onClose={() => setPasswordModal((prev) => ({ ...prev, open: false }))}
+        PaperProps={{
+          sx: {
+            bgcolor: "var(--card)",
+            backgroundImage: "none",
+            border: "1px solid var(--border)",
+            borderRadius: 5,
+            width: "100%",
+            maxWidth: 420,
+            overflow: "hidden",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            color: "var(--foreground)",
+            fontWeight: 800,
+            fontSize: "1.25rem",
+            pb: 1,
+          }}
+        >
+          Change Password
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <Box
+            sx={{
+              p: 2,
+              mb: 3,
+              borderRadius: 3,
+              bgcolor: "rgba(245, 158, 11, 0.05)",
+              border: "1px dashed rgba(245, 158, 11, 0.2)",
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{ color: "var(--muted-foreground)", mb: 0.5 }}
+            >
+              Changing password for user
+            </Typography>
+            <Typography variant="h6" sx={{ color: "#f59e0b", fontWeight: 800 }}>
+              {passwordModal.userName}
+            </Typography>
+          </Box>
+          <Stack spacing={2.5}>
+            <TextField
+              fullWidth
+              label="New Password"
+              type={passwordModal.showPassword ? "text" : "password"}
+              value={passwordModal.newPassword}
+              onChange={(e) =>
+                setPasswordModal((prev) => ({
+                  ...prev,
+                  newPassword: e.target.value,
+                }))
+              }
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() =>
+                        setPasswordModal((prev) => ({
+                          ...prev,
+                          showPassword: !prev.showPassword,
+                        }))
+                      }
+                      edge="end"
+                      size="small"
+                      sx={{ color: "var(--muted-foreground)" }}
+                    >
+                      {passwordModal.showPassword ? (
+                        <EyeOff size={18} />
+                      ) : (
+                        <Eye size={18} />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 3,
+                  bgcolor: "var(--background)",
+                },
+                "& .MuiInputLabel-root": { color: "var(--muted-foreground)" },
+                "& .MuiInputBase-input": { color: "var(--foreground)" },
+              }}
+              helperText="Minimum 6 characters"
+            />
+            <TextField
+              fullWidth
+              label="Confirm New Password"
+              type={passwordModal.showConfirm ? "text" : "password"}
+              value={passwordModal.confirmPassword}
+              onChange={(e) =>
+                setPasswordModal((prev) => ({
+                  ...prev,
+                  confirmPassword: e.target.value,
+                }))
+              }
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() =>
+                        setPasswordModal((prev) => ({
+                          ...prev,
+                          showConfirm: !prev.showConfirm,
+                        }))
+                      }
+                      edge="end"
+                      size="small"
+                      sx={{ color: "var(--muted-foreground)" }}
+                    >
+                      {passwordModal.showConfirm ? (
+                        <EyeOff size={18} />
+                      ) : (
+                        <Eye size={18} />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 3,
+                  bgcolor: "var(--background)",
+                },
+                "& .MuiInputLabel-root": { color: "var(--muted-foreground)" },
+                "& .MuiInputBase-input": { color: "var(--foreground)" },
+              }}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 0, gap: 1.5 }}>
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={() =>
+              setPasswordModal({
+                open: false,
+                userId: "",
+                userName: "",
+                newPassword: "",
+                confirmPassword: "",
+                showPassword: false,
+                showConfirm: false,
+              })
+            }
+            sx={{
+              borderRadius: 3,
+              py: 1.2,
+              fontWeight: 700,
+              borderColor: "var(--border)",
+              color: "var(--foreground)",
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            fullWidth
+            variant="contained"
+            startIcon={<Key size={18} />}
+            onClick={handlePasswordChange}
+            sx={{
+              borderRadius: 3,
+              py: 1.2,
+              fontWeight: 700,
+              bgcolor: "#f59e0b",
+              color: "#fff",
+              boxShadow: "0 4px 12px rgba(245, 158, 11, 0.25)",
+              "&:hover": { bgcolor: "#d97706" },
+            }}
+          >
+            Change Password
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}
@@ -837,7 +1129,13 @@ export default function UsersClient({ initialUsers }: { initialUsers: any[] }) {
   );
 }
 
-function UserCard({ user, onStatusToggle, onBalanceClick, loading }: any) {
+function UserCard({
+  user,
+  onStatusToggle,
+  onBalanceClick,
+  onPasswordClick,
+  loading,
+}: any) {
   return (
     <Paper
       elevation={0}
@@ -981,51 +1279,76 @@ function UserCard({ user, onStatusToggle, onBalanceClick, loading }: any) {
           </Grid>
         </Box>
 
-        <Stack direction="row" spacing={1.5}>
-          <Button
-            fullWidth
-            variant="outlined"
-            size="medium"
-            startIcon={<Wallet size={18} />}
-            onClick={onBalanceClick}
-            sx={{
-              borderRadius: 3,
-              borderColor: "var(--border)",
-              color: "var(--foreground)",
-              fontWeight: 700,
-              "&:hover": {
-                borderColor: "primary.main",
-                bgcolor: "rgba(99, 102, 241, 0.05)",
-              },
-            }}
-          >
-            Balance
-          </Button>
-          <Button
-            fullWidth
-            variant="contained"
-            size="medium"
-            color={user.status === "active" ? "error" : "success"}
-            disabled={loading}
-            onClick={onStatusToggle}
-            sx={{
-              borderRadius: 3,
-              fontWeight: 700,
-              boxShadow:
-                user.status === "active"
-                  ? "0 4px 12px rgba(239, 68, 68, 0.2)"
-                  : "0 4px 12px rgba(34, 197, 94, 0.2)",
-            }}
-          >
-            {loading ? (
-              <CircularProgress size={20} color="inherit" />
-            ) : user.status === "active" ? (
-              "Suspend"
-            ) : (
-              "Activate"
-            )}
-          </Button>
-        </Stack>
+        <Grid container spacing={1.5}>
+          <Grid size={{ xs: 6 }}>
+            <Button
+              fullWidth
+              variant="outlined"
+              size="medium"
+              startIcon={<Wallet size={18} />}
+              onClick={onBalanceClick}
+              sx={{
+                borderRadius: 3,
+                borderColor: "var(--border)",
+                color: "var(--foreground)",
+                fontWeight: 700,
+                "&:hover": {
+                  borderColor: "primary.main",
+                  bgcolor: "rgba(99, 102, 241, 0.05)",
+                },
+              }}
+            >
+              Balance
+            </Button>
+          </Grid>
+          <Grid size={{ xs: 6 }}>
+            <Button
+              fullWidth
+              variant="outlined"
+              size="medium"
+              startIcon={<Key size={18} />}
+              onClick={onPasswordClick}
+              sx={{
+                borderRadius: 3,
+                borderColor: "rgba(245, 158, 11, 0.3)",
+                color: "#f59e0b",
+                fontWeight: 700,
+                "&:hover": {
+                  borderColor: "#f59e0b",
+                  bgcolor: "rgba(245, 158, 11, 0.05)",
+                },
+              }}
+            >
+              Password
+            </Button>
+          </Grid>
+          <Grid size={{ xs: 12 }}>
+            <Button
+              fullWidth
+              variant="contained"
+              size="medium"
+              color={user.status === "active" ? "error" : "success"}
+              disabled={loading}
+              onClick={onStatusToggle}
+              sx={{
+                borderRadius: 3,
+                fontWeight: 700,
+                boxShadow:
+                  user.status === "active"
+                    ? "0 4px 12px rgba(239, 68, 68, 0.2)"
+                    : "0 4px 12px rgba(34, 197, 94, 0.2)",
+              }}
+            >
+              {loading ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : user.status === "active" ? (
+                "Suspend"
+              ) : (
+                "Activate"
+              )}
+            </Button>
+          </Grid>
+        </Grid>
       </Stack>
     </Paper>
   );
